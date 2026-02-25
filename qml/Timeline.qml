@@ -27,7 +27,9 @@ Rectangle {
     Component.onCompleted: updateTimelineProps()
     Connections {
         target: serialParser
-        function onSnapshotsChanged() { updateTimelineProps(); }
+        function onSnapshotsChanged() {
+            updateTimelineProps();
+        }
     }
     onCurrentFrameChanged: updateTimelineProps()
 
@@ -296,6 +298,7 @@ Rectangle {
                     onClicked: function (mouse) {
                         var ratio = Math.max(0, Math.min(1, mouse.x / parent.width));
                         timeline.currentFrame = Math.round(ratio * timeline.maxFrames);
+                        serialParser.restoreToIndex(currentFrame);
                     }
                     onPositionChanged: function (mouse) {
                         if (pressed) {
