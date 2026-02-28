@@ -194,6 +194,169 @@ Q_INVOKABLE qint64 SerialParser::timestampAt(int index) const {
   return m_snapshots[index].timestamp;
 }
 
+Q_INVOKABLE bool SerialParser::saveToFile(QUrl filePath) {
+  if (filePath.isEmpty()) {
+    qDebug() << "No file path provided for saving.";
+    return false;
+  }
+
+  QFile file(filePath.toLocalFile());
+  if (!file.open(QIODevice::WriteOnly)) {
+    qDebug() << "Failed to open file for writing:" << filePath;
+    return false;
+  }
+  QJsonArray snapshotsArray;
+  for (int i = 0; i < m_snapshots.size(); ++i) {
+    const auto &snap = m_snapshots.at(i);
+
+    QJsonObject snapObj;
+    snapObj["timestamp"] = snap.timestamp;
+    QJsonArray sensorsArray;
+    for (const auto &sensor : snap.sensors) {
+      QJsonObject sensorObj;
+      sensorObj["name"] = sensor.name;
+      sensorObj["input"] = sensor.inputValue;
+      sensorObj["threshold"] = sensor.threshold;
+      sensorObj["isTriggered"] = sensor.isTriggered;
+      QJsonObject locationObj;
+      locationObj["x"] = sensor.x;
+      locationObj["y"] = sensor.y;
+      sensorObj["location"] = locationObj;
+      sensorsArray.append(sensorObj);
+    }
+    snapObj["sensors"] = sensorsArray;
+    QJsonArray vectorsArray;
+    for (const auto &vector : snap.vectors) {
+      QJsonObject vectorObj;
+      vectorObj["name"] = vector.name;
+      vectorObj["rotation"] = vector.rotation;
+      vectorObj["scale"] = vector.scale;
+      vectorObj["color"] = vector.color.name();
+      QJsonObject locationObj;
+      locationObj["x"] = vector.x;
+      locationObj["y"] = vector.y;
+      vectorObj["location"] = locationObj;
+      vectorsArray.append(vectorObj);
+    }
+    snapObj["vectors"] = vectorsArray;
+    snapshotsArray.append(snapObj);
+  }
+  QJsonDocument doc(snapshotsArray);
+  qint64 bytesWritten = file.write(doc.toJson(QJsonDocument::Compact));
+  file.close();
+  if (bytesWritten == -1) {
+    qDebug() << "Failed to write to file:" << filePath;
+    return false;
+  }
+  qDebug() << "Successfully saved" << snapshotsArray.size() << "snapshots to"
+           << filePath;
+  return true;
+}
+
+Q_INVOKABLE bool SerialParser::loadFromFile(QUrl filePath) {
+  if (filePath.isEmpty()) {
+    qDebug() << "No file path provided for loading.";
+    return false;
+  }
+
+  QFile file(filePath.toLocalFile());
+  if (!file.open(QIODevice::ReadOnly)) {
+    qDebug() << "Failed to open file for reading:" << filePath;
+    return false;
+  }
+
+  QByteArray jsonData = file.readAll();
+  file.close();
+
+  QJsonParseError parseError;
+  QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
+  if (parseError.error != QJsonParseError::NoError) {
+    qDebug() << "JSON parse error in file:" << parseError.errorString();
+    return false;
+  }
+
+  if (!doc.isArray()) {
+    qDebug() << "Expected JSON array in file";
+    return false;
+  }
+  m_snapshots.clear();
+  QJsonArray snapshotsArray = doc.array();
+  for (int i = 0; i < snapshotsArray.size(); ++i) {
+    const QJsonValue &snapVal = snapshotsArray.at(i);
+    if (!snapVal.isObject()) {
+      qDebug() << "Skipping invalid snapshot entry";
+      continue;
+    }
+
+    QJsonObject snapObj = snapVal.toObject();
+    FrameSnapshot snapshot;
+    snapshot.timestamp = snapObj["timestamp"].toInteger();
+
+    QJsonArray sensorsArray = snapObj["sensors"].toArray();
+    for (int j = 0; j < sensorsArray.size(); ++j) {
+      const QJsonValue &sensorVal = sensorsArray.at(j);
+      if (!sensorVal.isObject()) {
+        qDebug() << "Skipping invalid sensor entry";
+        continue;
+      }
+
+      QJsonObject sensorObj = sensorVal.toObject();
+      Sensor sensor;
+      sensor.name = sensorObj["name"].toString();
+      sensor.inputValue = sensorObj["input"].toDouble();
+      sensor.threshold = sensorObj["threshold"].toDouble();
+      sensor.isTriggered = sensorObj["isTriggered"].toBool();
+
+      if (sensorObj.contains("location") && sensorObj["location"].isObject()) {
+        QJsonObject locationObj = sensorObj["location"].toObject();
+        sensor.x = locationObj["x"].toDouble();
+        sensor.y = locationObj["y"].toDouble();
+      } else {
+        qDebug() << "Sensor" << sensor.name
+                 << "is missing location data, defaulting to (0,0)";
+        sensor.x = 0;
+        sensor.y = 0;
+      }
+
+      snapshot.sensors.append(sensor);
+    }
+
+    QJsonArray vectorsArray = snapObj["vectors"].toArray();
+    for (int k = 0; k < vectorsArray.size(); ++k) {
+      const QJsonValue &vectorVal = vectorsArray.at(k);
+      if (!vectorVal.isObject()) {
+        qDebug() << "Skipping invalid vector entry";
+        continue;
+      }
+
+      QJsonObject vectorObj = vectorVal.toObject();
+      Vector vector;
+      vector.name = vectorObj["name"].toString();
+      vector.rotation = vectorObj["rotation"].toDouble();
+      vector.scale = vectorObj["scale"].toDouble();
+      vector.color = QColor(vectorObj["color"].toString());
+
+      if (vectorObj.contains("location") && vectorObj["location"].isObject()) {
+        QJsonObject locationObj = vectorObj["location"].toObject();
+        vector.x = locationObj["x"].toDouble();
+        vector.y = locationObj["y"].toDouble();
+      } else {
+        qDebug() << "Vector" << vector.name
+                 << "is missing location data, defaulting to (0,0)";
+        vector.x = 0;
+        vector.y = 0;
+      }
+
+      snapshot.vectors.append(vector);
+    }
+    m_snapshots.append(snapshot);
+  }
+  restoreToIndex(1);
+  qDebug() << "Successfully loaded" << m_snapshots.size() << "snapshots from"
+           << filePath;
+  return true;
+}
+
 void SerialParser::processJsonData(const QByteArray &jsonData) {
   QJsonParseError parseError;
   QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);

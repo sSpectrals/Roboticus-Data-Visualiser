@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import com.Roboticus.ControlCenter
 
 Rectangle {
@@ -360,7 +361,20 @@ Rectangle {
             ToolTip.visible: hovered
             ToolTip.delay: 500
 
-            onClicked: timeline.saveRequested()
+            onClicked: saveFileDialog.open()
+
+            FileDialog {
+                id: saveFileDialog
+                fileMode: FileDialog.SaveFile
+                title: "Save Serial Data"
+                nameFilters: ["JSON Files (*.json)"]
+                modality: Qt.ApplicationModal
+                onAccepted: {
+                    if (selectedFile) {
+                        serialParser.saveToFile(selectedFile);
+                    }
+                }
+            }
 
             HoverHandler {
                 cursorShape: saveButton.hovered ? Qt.PointingHandCursor : Qt.ArrowCursor
@@ -422,8 +436,22 @@ Rectangle {
             ToolTip.visible: hovered
             ToolTip.delay: 500
 
-            onClicked: timeline.loadRequested()
+            onClicked: loadFileDialog.open()
 
+            FileDialog {
+                id: loadFileDialog
+                fileMode: FileDialog.OpenFile
+                flags: FileDialog.ReadOnly
+                title: "Load Serial Data"
+                nameFilters: ["JSON Files (*.json)"]
+                modality: Qt.ApplicationModal
+                onAccepted: {
+                    if (selectedFile) {
+                        serialParser.loadFromFile(selectedFile);
+                        updateTimelineProps();
+                    }
+                }
+            }
             HoverHandler {
                 cursorShape: loadButton.hovered ? Qt.PointingHandCursor : Qt.ArrowCursor
             }

@@ -2,6 +2,7 @@
 #define SERIALPARSER_H
 
 #include <QDebug>
+#include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -10,6 +11,8 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QTimer>
+#include <QUrl>
+
 
 #include "SensorModel.h"
 #include "VectorModel.h"
@@ -54,6 +57,9 @@ public:
 
   Q_INVOKABLE int snapshotCount() const { return m_snapshots.size(); }
   Q_INVOKABLE qint64 timestampAt(int index) const;
+
+  Q_INVOKABLE bool saveToFile(QUrl filePath);
+  Q_INVOKABLE bool loadFromFile(QUrl filePath);
 
 signals:
   void connectionChanged();
