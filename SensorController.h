@@ -17,8 +17,9 @@ public:
 
   Q_INVOKABLE Sensor addSensor(const QString &name = QString(),
                                double input = 0.0, double threshold = 100.0,
-                               const bool &isTriggered = false, int layer = 1,
-                               double x = 0.0, double y = 0.0);
+                               const bool &isTriggered = false,
+                               QString layer = "Layer 1", double x = 0.0,
+                               double y = 0.0);
 
   Q_INVOKABLE bool removeSensor(const QUuid &id);
 
@@ -32,12 +33,12 @@ public:
 
 signals:
   void sensorAdded(const QUuid &id, const QString &name, double input,
-                   double threshold, const bool &isTriggered, int layer,
-                   double x, double y);
+                   double threshold, const bool &isTriggered,
+                   const QString &layer, double x, double y);
   void sensorRemoved(const QUuid &id);
   void sensorUpdated(const QUuid &id, const QString &name, double input,
-                     double threshold, const bool &isTriggered, int layer,
-                     double x, double y);
+                     double threshold, const bool &isTriggered,
+                     const QString &layer, double x, double y);
 
 private:
   SensorModel *m_model;

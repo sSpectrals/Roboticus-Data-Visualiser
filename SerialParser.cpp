@@ -133,7 +133,8 @@ void SerialParser::setModels(QList<Sensor> sensors, QList<Vector> vectors) {
   }
 
   for (const Vector &v : vectors) {
-    m_vectorModel->addVector(v.name, v.rotation, v.scale, v.color, v.x, v.y);
+    m_vectorModel->addVector(v.name, v.rotation, v.scale, v.color, v.layer, v.x,
+                             v.y);
   }
 }
 
@@ -219,6 +220,7 @@ Q_INVOKABLE bool SerialParser::saveToFile(QUrl filePath) {
       sensorObj["threshold"] = sensor.threshold;
       sensorObj["isTriggered"] = sensor.isTriggered;
       sensorObj["layer"] = sensor.layer;
+
       QJsonObject locationObj;
       locationObj["x"] = sensor.x;
       locationObj["y"] = sensor.y;
@@ -234,6 +236,8 @@ Q_INVOKABLE bool SerialParser::saveToFile(QUrl filePath) {
       vectorObj["rotation"] = vector.rotation;
       vectorObj["scale"] = vector.scale;
       vectorObj["color"] = vector.color.name();
+      vectorObj["layer"] = vector.layer;
+
       QJsonObject locationObj;
       locationObj["x"] = vector.x;
       locationObj["y"] = vector.y;
@@ -241,6 +245,7 @@ Q_INVOKABLE bool SerialParser::saveToFile(QUrl filePath) {
       vectorsArray.append(vectorObj);
     }
     snapObj["vectors"] = vectorsArray;
+
     snapshotsArray.append(snapObj);
   }
   QJsonDocument doc(snapshotsArray);
@@ -309,7 +314,7 @@ Q_INVOKABLE bool SerialParser::loadFromFile(QUrl filePath) {
       sensor.inputValue = sensorObj["input"].toDouble();
       sensor.threshold = sensorObj["threshold"].toDouble();
       sensor.isTriggered = sensorObj["isTriggered"].toBool();
-      sensor.layer = sensorObj["layer"].toInt();
+      sensor.layer = sensorObj["layer"].toString();
 
       if (sensorObj.contains("location") && sensorObj["location"].isObject()) {
         QJsonObject locationObj = sensorObj["location"].toObject();
@@ -339,7 +344,7 @@ Q_INVOKABLE bool SerialParser::loadFromFile(QUrl filePath) {
       vector.rotation = vectorObj["rotation"].toDouble();
       vector.scale = vectorObj["scale"].toDouble();
       vector.color = QColor(vectorObj["color"].toString());
-
+      vector.layer = vectorObj["layer"].toString();
       if (vectorObj.contains("location") && vectorObj["location"].isObject()) {
         QJsonObject locationObj = vectorObj["location"].toObject();
         vector.x = locationObj["x"].toDouble();
@@ -431,7 +436,7 @@ void SerialParser::updateSensorsFromJson(const QJsonArray &sensors) {
                                      : inputVal.toDouble(-1);
 
     bool isTriggered = sensorObj["isTriggered"].toBool(false);
-    int layer = sensorObj["layer"].toInt(1);
+    QString layer = sensorObj["layer"].toString("Layer 1");
 
     QJsonObject location = sensorObj["location"].toObject();
     double x = location["x"].toDouble(0.0);
@@ -465,6 +470,7 @@ void SerialParser::updateVectorsFromJson(const QJsonArray &vectors) {
     QString name = vectorObj["name"].toString();
     double rotation = vectorObj["rotation"].toDouble();
     QString color = vectorObj["color"].toString("#ffffff");
+    QString layer = vectorObj["layer"].toString("Layer 1");
 
     QJsonObject location = vectorObj["location"].toObject();
     double x = location["x"].toDouble();
@@ -479,9 +485,10 @@ void SerialParser::updateVectorsFromJson(const QJsonArray &vectors) {
       m_vectorModel->setData(modelIdx, color, VectorModel::ColorRole);
       m_vectorModel->setData(modelIdx, x, VectorModel::XRole);
       m_vectorModel->setData(modelIdx, y, VectorModel::YRole);
+      m_vectorModel->setData(modelIdx, layer, VectorModel::LayerRole);
     } else {
       // Add new vector
-      m_vectorModel->addVector(name, rotation, 1.0, QColor(color), x, y);
+      m_vectorModel->addVector(name, rotation, 1.0, QColor(color), layer, x, y);
     }
   }
 }

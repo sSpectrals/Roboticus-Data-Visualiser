@@ -80,8 +80,8 @@ bool SensorModel::setData(const QModelIndex &index, const QVariant &value,
     }
     break;
   case LayerRole:
-    if (sensor.layer != value.toInt()) {
-      sensor.layer = value.toInt();
+    if (sensor.layer != value.toString()) {
+      sensor.layer = value.toString();
       changed = true;
     }
     break;
@@ -120,7 +120,8 @@ QHash<int, QByteArray> SensorModel::roleNames() const {
 }
 
 Sensor SensorModel::addSensor(QString name, double input, double threshold,
-                              bool isTriggered, int layer, double x, double y) {
+                              bool isTriggered, QString layer, double x,
+                              double y) {
 
   Sensor sensor;
   sensor.name =

@@ -16,7 +16,8 @@ SensorController::SensorController(QObject *parent)
 Q_INVOKABLE Sensor SensorController::addSensor(const QString &name,
                                                double input, double threshold,
                                                const bool &isTriggered,
-                                               int layer, double x, double y) {
+                                               QString layer, double x,
+                                               double y) {
 
   if (!m_model)
     return Sensor();

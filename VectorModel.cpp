@@ -68,8 +68,8 @@ bool VectorModel::setData(const QModelIndex &index, const QVariant &value,
     }
     break;
   case LayerRole:
-    if (vector.layer != value.toInt()) {
-      vector.layer = value.toInt();
+    if (vector.layer != value.toString()) {
+      vector.layer = value.toString();
       changed = true;
     }
     break;
@@ -116,7 +116,7 @@ QHash<int, QByteArray> VectorModel::roleNames() const {
 }
 
 Vector VectorModel::addVector(QString name, double rotation, double scale,
-                              QColor color, int layer, double x, double y) {
+                              QColor color, QString layer, double x, double y) {
   Vector vector;
   vector.name = name;
   vector.rotation = rotation;

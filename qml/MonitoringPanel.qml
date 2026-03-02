@@ -80,6 +80,7 @@ Flickable {
                     ComboBox {
                         id: sensorLayerSelection
                         model: ["Layer 1", "Layer 2", "Layer 3", "Layer 4", "Layer 5"]
+                        // visible: serialParser.availableSensorLayers.length > 1
                         currentIndex: 0
 
                         anchors.verticalCenter: parent.verticalCenter
@@ -231,6 +232,7 @@ Flickable {
                     ComboBox {
                         id: vectorLayerSelection
                         model: ["Layer 1", "Layer 2", "Layer 3", "Layer 4", "Layer 5"]
+                        // visible: serialParser.availableVectorLayers.length > 1
                         currentIndex: 0
 
                         anchors.verticalCenter: parent.verticalCenter

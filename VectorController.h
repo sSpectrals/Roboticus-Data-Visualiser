@@ -18,8 +18,9 @@ public:
 
   Q_INVOKABLE Vector addVector(const QString &name = QString(),
                                double rotation = 0, double scale = 1,
-                               QColor color = "white", int layer = 1,
-                               double x = 0.0, double y = 0.0);
+                               QColor color = "white",
+                               QString layer = "Layer 1", double x = 0.0,
+                               double y = 0.0);
   Q_INVOKABLE bool removeVector(const QUuid &id);
 
   Q_INVOKABLE bool setVectorRotation(const QUuid &id, double rotation);
@@ -32,12 +33,12 @@ public:
 
 signals:
   void vectorAdded(const QUuid &id, const QString &name, double rotation,
-                   double scale, const QColor &color, int layer, double x,
-                   double y);
+                   double scale, const QColor &color, const QString &layer,
+                   double x, double y);
   void vectorRemoved(const QUuid &id);
   void vectorUpdated(const QUuid &id, const QString &name, double rotation,
-                     double scale, const QColor &color, int layer, double x,
-                     double y);
+                     double scale, const QColor &color, const QString &layer,
+                     double x, double y);
 
 private:
   VectorModel *m_model;
