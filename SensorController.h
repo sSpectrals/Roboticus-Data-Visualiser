@@ -31,6 +31,8 @@ public:
   Q_INVOKABLE bool setSensorPositionX(const QUuid &id, double x);
   Q_INVOKABLE bool setSensorPositionY(const QUuid &id, double y);
 
+  Q_INVOKABLE void setActiveLayer(const QString &layerName);
+
 signals:
   void sensorAdded(const QUuid &id, const QString &name, double input,
                    double threshold, const bool &isTriggered,
@@ -39,6 +41,7 @@ signals:
   void sensorUpdated(const QUuid &id, const QString &name, double input,
                      double threshold, const bool &isTriggered,
                      const QString &layer, double x, double y);
+  void clearChartSeries();
 
 private:
   SensorModel *m_model;

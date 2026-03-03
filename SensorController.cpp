@@ -152,3 +152,19 @@ Q_INVOKABLE bool SensorController::setSensorPositionY(const QUuid &id,
 
   return m_model->setData(m_model->index(index), y, SensorModel::YRole);
 }
+
+Q_INVOKABLE void SensorController::setActiveLayer(const QString &layerName) {
+  if (!m_model)
+    return;
+
+  emit clearChartSeries();
+
+  const auto &sensors = m_model->getAllSensors();
+  for (const auto &sensor : sensors) {
+    if (sensor.layer == layerName) {
+      emit sensorAdded(sensor.id, sensor.name, sensor.inputValue,
+                       sensor.threshold, sensor.isTriggered, sensor.layer,
+                       sensor.x, sensor.y);
+    }
+  }
+}

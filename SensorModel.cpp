@@ -176,3 +176,8 @@ int SensorModel::getIndexByName(const QString &name) const {
       return i;
   return -1;
 }
+
+QList<Sensor> SensorModel::setActiveLayer(const QString &layerName) {
+
+  return QList<Sensor>();
+}

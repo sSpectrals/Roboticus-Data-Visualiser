@@ -57,6 +57,8 @@ public:
   Q_INVOKABLE int getIndexByName(const QString &name) const;
   QList<Sensor> getAllSensors() const { return m_sensors; }
 
+  QList<Sensor> setActiveLayer(const QString &layerName);
+
 signals:
   void sensorAdded(const QUuid &id, const QString &name, double input,
                    double threshold, const bool &isTriggered,

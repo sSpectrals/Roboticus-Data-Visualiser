@@ -13,7 +13,6 @@
 #include <QTimer>
 #include <QUrl>
 
-
 #include "SensorModel.h"
 #include "VectorModel.h"
 

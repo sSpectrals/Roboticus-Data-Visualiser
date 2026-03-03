@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls 2.15
+import QtQml.Models
 import com.Roboticus.ControlCenter
 
 Flickable {
@@ -14,6 +15,9 @@ Flickable {
 
     required property var sensorController
     required property var vectorController
+
+    property string selectedSensorLayer: "Layer 1"
+    property string selectedVectorLayer: "Layer 1"
 
     ScrollBar.vertical: ScrollBar {
         id: verticalScrollBar
@@ -34,6 +38,17 @@ Flickable {
         }
     }
 
+    SortFilterProxyModel {
+        id: filteredSensorModel
+        model: sensorController.model
+        filters: [
+            ValueFilter {
+                roleName: "layer"
+                value: flickable.selectedSensorLayer
+            }
+        ]
+    }
+
     Column {
         id: column
         width: parent.width
@@ -46,7 +61,7 @@ Flickable {
             width: parent.width
             height: contentHeight
             interactive: false
-            model: sensorController.model
+            model: filteredSensorModel
             spacing: 0
             clip: true
 
@@ -150,7 +165,8 @@ Flickable {
                         }
 
                         onActivated: function (index) {
-                            // SerialParser.setLayer
+                            flickable.selectedSensorLayer = sensorLayerSelection.currentText;
+                            sensorController.setActiveLayer(sensorLayerSelection.currentText);
                             focus = false;
                         }
                     }
