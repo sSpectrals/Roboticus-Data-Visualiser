@@ -45,8 +45,9 @@ Q_INVOKABLE bool VectorController::setVectorRotation(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set rotation for non-existent vector with id:"
-               << id;
+    emit errorOccurred(
+        QString("Attempted to set rotation for non-existent vector with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -62,8 +63,9 @@ Q_INVOKABLE bool VectorController::setVectorScale(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set scale for non-existent vector with id:"
-               << id;
+    emit errorOccurred(
+        QString("Attempted to set scale for non-existent vector with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -78,8 +80,9 @@ Q_INVOKABLE bool VectorController::setVectorColor(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set color for non-existent vector with id:"
-               << id;
+    emit errorOccurred(
+        QString("Attempted to set color for non-existent vector with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -94,8 +97,9 @@ Q_INVOKABLE bool VectorController::setVectorName(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set name for non-existent vector with id:"
-               << id;
+    emit errorOccurred(
+        QString("Attempted to set name for non-existent vector with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -110,8 +114,9 @@ Q_INVOKABLE bool VectorController::setVectorPositionXY(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set position for non-existent vector with id:"
-               << id;
+    emit errorOccurred(
+        QString("Attempted to set position for non-existent vector with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -131,8 +136,10 @@ Q_INVOKABLE bool VectorController::setVectorPositionX(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set position X for non-existent vector with id:"
-               << id;
+    emit errorOccurred(
+        QString(
+            "Attempted to set position X for non-existent vector with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -147,8 +154,10 @@ Q_INVOKABLE bool VectorController::setVectorPositionY(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set position Y for non-existent vector with id:"
-               << id;
+    emit errorOccurred(
+        QString(
+            "Attempted to set position Y for non-existent vector with id: %1")
+            .arg(id.toString()));
     return false;
   }
 

@@ -25,7 +25,7 @@ Window {
         }
 
         onSensorRemoved: function (id) {
-            sensorPanel.removePointFromGraph(id);
+            sensorController.setActiveLayer(monitor.selectedSensorLayer);
         }
 
         onSensorUpdated: function (id, name, input, threshold, isTriggered, layer, x, y) {
@@ -36,6 +36,10 @@ Window {
 
         onClearChartSeries: function () {
             sensorPanel.clearPoints();
+        }
+
+        onErrorOccurred: function (message) {
+            errorPopup.show(message);
         }
     }
 
@@ -49,7 +53,7 @@ Window {
         }
 
         onVectorRemoved: function (id) {
-            sensorPanel.removeArrowFromGraph(id);
+            vectorController.setActiveLayer(monitor.selectedVectorLayer);
         }
 
         onVectorUpdated: function (id, name, rotation, scale, color, layer, x, y) {
@@ -61,11 +65,19 @@ Window {
         onClearChartSeries: function () {
             sensorPanel.clearArrows();
         }
+
+        onErrorOccurred: function (message) {
+            errorPopup.show(message);
+        }
     }
 
     SerialParser {
         id: serialParser
         Component.onCompleted: setModels(sensorController.model, vectorController.model)
+
+        onErrorOccurred: function (message) {
+            errorPopup.show(message);
+        }
     }
 
     Rectangle {
@@ -127,7 +139,10 @@ Window {
         serialParser: serialParser
 
         onCurrentFrameChanged: {
-            sensorPanel.clearGraph();
+            if (!serialParser.isConnected) {
+                sensorPanel.clearGraph();
+                serialParser.restoreToIndex(timelineBar.currentFrame);
+            }
             timelineBar.updateTimelineProps();
         }
 
@@ -135,6 +150,12 @@ Window {
             target: serialParser
             function onSnapshotsChanged() {
                 timelineBar.updateTimelineProps();
+            }
+            function onConnectionChanged() {
+                if (serialParser.isConnected) {
+                    sensorController.setActiveLayer(monitor.selectedSensorLayer);
+                    vectorController.setActiveLayer(monitor.selectedVectorLayer);
+                }
             }
         }
     }

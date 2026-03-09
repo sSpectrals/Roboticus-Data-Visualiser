@@ -66,6 +66,7 @@ signals:
   void dataReceived(QByteArray data);
   void availablePortsChanged();
   void snapshotsChanged();
+  void errorOccurred(QString message);
 
 private:
   QStringList m_availablePorts;

@@ -15,7 +15,9 @@ public:
   explicit SensorController(QObject *parent = nullptr);
 
   SensorModel *model() const { return m_model; }
-  QList<QString> layers() const { return m_model ? m_model->layers() : QList<QString>(); }
+  QList<QString> layers() const {
+    return m_model ? m_model->layers() : QList<QString>();
+  }
 
   Q_INVOKABLE Sensor addSensor(const QString &name = QString(),
                                double input = 0.0, double threshold = 100.0,
@@ -45,6 +47,7 @@ signals:
                      const QString &layer, double x, double y);
   void clearChartSeries();
   void layersChanged();
+  void errorOccurred(QString message);
 
 private:
   SensorModel *m_model;

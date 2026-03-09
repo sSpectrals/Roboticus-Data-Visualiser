@@ -15,8 +15,16 @@ Q_INVOKABLE bool SerialParser::connectToPort() {
     m_serial.close();
   }
 
-  if (m_serial.portName().isEmpty() || m_serial.baudRate() <= 0) {
+  if (m_serial.portName().isEmpty()) {
+    qDebug() << "No COM port selected";
+    emit errorOccurred(
+        "No COM port selected. Please choose a port to connect.");
+    return false;
+  }
+
+  if (m_serial.baudRate() <= 0) {
     qDebug() << "failed to set port or baudrate";
+    emit errorOccurred("Failed to set baud rate. Please check your settings.");
     return false;
   }
 
@@ -25,7 +33,7 @@ Q_INVOKABLE bool SerialParser::connectToPort() {
   bool success = m_serial.open(QIODevice::ReadOnly);
 
   if (success) {
-    m_serial.setDataTerminalReady(true);
+    m_serial.setDataTerminalReady(false);
 
     // Clear any startup garbage (null bytes from Arduino reset)
     m_buffer.clear();
@@ -44,6 +52,8 @@ Q_INVOKABLE bool SerialParser::connectToPort() {
              << "\nCheck if you have a serial monitor open somewhere else";
     qDebug() << "Port:" << m_serial.portName()
              << "Baud:" << m_serial.baudRate();
+    emit errorOccurred("Failed to connect to port. Please check if the port is "
+                       "correct and not in use by another application.");
   }
 
   return success;
@@ -148,6 +158,8 @@ void SerialParser::readData() {
 
   if (!m_serial.isOpen()) {
     qDebug() << "Could not read serial data";
+    emit errorOccurred(
+        "Could not read serial data. Please check your connection.");
     return;
   }
 
@@ -204,6 +216,8 @@ Q_INVOKABLE bool SerialParser::saveToFile(QUrl filePath) {
   QFile file(filePath.toLocalFile());
   if (!file.open(QIODevice::WriteOnly)) {
     qDebug() << "Failed to open file for writing:" << filePath;
+    emit errorOccurred(
+        "Failed to open file for writing. Please check the file path.");
     return false;
   }
   QJsonArray snapshotsArray;
@@ -270,6 +284,8 @@ Q_INVOKABLE bool SerialParser::loadFromFile(QUrl filePath) {
   QFile file(filePath.toLocalFile());
   if (!file.open(QIODevice::ReadOnly)) {
     qDebug() << "Failed to open file for reading:" << filePath;
+    emit errorOccurred(
+        "Failed to open file for reading. Please check the file path.");
     return false;
   }
 
@@ -280,11 +296,14 @@ Q_INVOKABLE bool SerialParser::loadFromFile(QUrl filePath) {
   QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
   if (parseError.error != QJsonParseError::NoError) {
     qDebug() << "JSON parse error in file:" << parseError.errorString();
+    emit errorOccurred(
+        "Failed to parse JSON file. Please check the file format.");
     return false;
   }
 
   if (!doc.isArray()) {
     qDebug() << "Expected JSON array in file";
+    emit errorOccurred("Invalid file format. Please check the file.");
     return false;
   }
   m_snapshots.clear();
@@ -381,6 +400,7 @@ void SerialParser::processJsonData(const QByteArray &jsonData) {
   // Save snapshot for timeline replay
   FrameSnapshot snapshot;
   snapshot.timestamp = timestamp;
+
   snapshot.sensors =
       m_sensorModel ? m_sensorModel->getAllSensors() : QList<Sensor>();
   snapshot.vectors =

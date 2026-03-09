@@ -16,7 +16,9 @@ public:
   explicit VectorController(QObject *parent = nullptr);
 
   VectorModel *model() const { return m_model; }
-  QList<QString> layers() const { return m_model ? m_model->layers() : QList<QString>(); }
+  QList<QString> layers() const {
+    return m_model ? m_model->layers() : QList<QString>();
+  }
 
   Q_INVOKABLE Vector addVector(const QString &name = QString(),
                                double rotation = 0, double scale = 1,
@@ -45,6 +47,7 @@ signals:
                      double x, double y);
   void clearChartSeries();
   void layersChanged();
+  void errorOccurred(QString message);
 
 private:
   VectorModel *m_model;

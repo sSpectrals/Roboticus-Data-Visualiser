@@ -246,7 +246,7 @@ Rectangle {
             onClicked: {
                 if (serialParser.isConnected) {
                     serialParser.disconnectPort();
-                } else if (serialParser.availablePortsList.length > 0) {
+                } else {
                     serialParser.connectToPort();
                 }
             }

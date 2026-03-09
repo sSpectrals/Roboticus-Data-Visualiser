@@ -21,6 +21,9 @@ Rectangle {
 
     function updateTimelineProps() {
         maxFrames = serialParser.snapshotCount() > 0 ? serialParser.snapshotCount() - 1 : 0;
+        if (serialParser.isConnected) {
+            currentFrame = maxFrames;
+        }
         currentTime = serialParser.snapshotCount() > 0 ? serialParser.timestampAt(currentFrame) / 1000.0 : 0.0;
         maxTime = serialParser.snapshotCount() > 0 ? serialParser.timestampAt(serialParser.snapshotCount() - 1) / 1000.0 : 60.0;
     }

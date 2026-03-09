@@ -48,8 +48,9 @@ Q_INVOKABLE bool SensorController::setSensorValue(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set value for non-existent sensor with id:"
-               << id;
+    emit errorOccurred(
+        QString("Attempted to set value for non-existent sensor with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -64,8 +65,10 @@ Q_INVOKABLE bool SensorController::setSensorThreshold(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set threshold for non-existent sensor with id:"
-               << id;
+    emit errorOccurred(
+        QString(
+            "Attempted to set threshold for non-existent sensor with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -80,8 +83,10 @@ Q_INVOKABLE bool SensorController::setTriggered(const QUuid &id,
     return false;
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set triggered for non-existent sensor with id:"
-               << id;
+    emit errorOccurred(
+        QString(
+            "Attempted to set triggered for non-existent sensor with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -97,8 +102,9 @@ Q_INVOKABLE bool SensorController::setSensorName(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set name for non-existent sensor with id:"
-               << id;
+    emit errorOccurred(
+        QString("Attempted to set name for non-existent sensor with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -112,8 +118,9 @@ Q_INVOKABLE bool SensorController::setSensorPositionXY(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set position for non-existent sensor with id:"
-               << id;
+    emit errorOccurred(
+        QString("Attempted to set position for non-existent sensor with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -132,8 +139,10 @@ Q_INVOKABLE bool SensorController::setSensorPositionX(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set position X for non-existent sensor with id:"
-               << id;
+    emit errorOccurred(
+        QString(
+            "Attempted to set position X for non-existent sensor with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
@@ -147,8 +156,10 @@ Q_INVOKABLE bool SensorController::setSensorPositionY(const QUuid &id,
 
   int index = m_model->getIndexFromId(id);
   if (index < 0) {
-    qWarning() << "Attempted to set position Y for non-existent sensor with id:"
-               << id;
+    emit errorOccurred(
+        QString(
+            "Attempted to set position Y for non-existent sensor with id: %1")
+            .arg(id.toString()));
     return false;
   }
 
