@@ -139,6 +139,10 @@ Window {
         }
     }
 
+    Error {
+        id: errorPopup
+    }
+
     // AddItem {
     //     id: addSensorButton
     //     anchors {
