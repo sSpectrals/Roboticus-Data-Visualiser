@@ -4,9 +4,9 @@ project(Roboticus_control_center VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick Graphs SerialPort)
+find_package(Qt6 REQUIRED COMPONENTS Quick Graphs SerialPort Gui)
 
-qt_standard_project_setup(REQUIRES 6.10)
+qt_standard_project_setup(REQUIRES 6.11)
 
 qt_add_executable(appRoboticus_control_center
     main.cpp
@@ -61,7 +61,7 @@ set_target_properties(appRoboticus_control_center PROPERTIES
 )
 
 target_link_libraries(appRoboticus_control_center
-    PRIVATE Qt6::Quick Qt6::Graphs Qt6::SerialPort
+    PRIVATE Qt6::Quick Qt6::Graphs Qt6::SerialPort Qt6::Gui
 )
 
 include(GNUInstallDirs)

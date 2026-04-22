@@ -5,75 +5,89 @@
 #include <QQmlEngine>
 #include <QUuid>
 
-struct Sensor {
-  QUuid id;
-  QString name = "No Name Set";
-  double inputValue = -1.0;
-  double threshold = -1.0;
-  bool isTriggered = false;
-  QString layer = "Layer 1";
-  double x = 0.0;
-  double y = 0.0;
+struct Sensor
+{
+    QUuid id;
+    QString name = "No Name Set";
+    double inputValue = -1.0;
+    double threshold = -1.0;
+    bool isTriggered = false;
+    QString layer = "Layer 1";
+    double x = 0.0;
+    double y = 0.0;
 
-  Sensor() : id(QUuid::createUuid()) {}
+    Sensor()
+        : id(QUuid::createUuid())
+    {}
 };
 
-class SensorModel : public QAbstractListModel {
-  Q_OBJECT
-  QML_ELEMENT
+class SensorModel : public QAbstractListModel
+{
+    Q_OBJECT
+    QML_ELEMENT
 
-  Q_PROPERTY(QList<QString> layers READ layers NOTIFY layersChanged)
+    Q_PROPERTY(QList<QString> layers READ layers NOTIFY layersChanged)
 public:
-  enum Roles {
-    IdRole = Qt::UserRole + 1,
-    NameRole,
-    InputRole,
-    ThresholdRole,
-    TriggerRole,
-    LayerRole,
-    XRole,
-    YRole
-  };
-  Q_ENUM(Roles)
+    enum Roles {
+        IdRole = Qt::UserRole + 1,
+        NameRole,
+        InputRole,
+        ThresholdRole,
+        TriggerRole,
+        LayerRole,
+        XRole,
+        YRole
+    };
+    Q_ENUM(Roles)
 
-  explicit SensorModel(QObject *parent = nullptr);
+    explicit SensorModel(QObject *parent = nullptr);
 
-  QList<QString> layers() const { return m_layers; }
+    QList<QString> layers() const { return m_layers; }
 
-  virtual int
-  rowCount(const QModelIndex &parent = QModelIndex()) const override;
-  virtual QVariant data(const QModelIndex &index, int role) const override;
-  virtual bool setData(const QModelIndex &index, const QVariant &value,
-                       int role) override;
-  virtual QHash<int, QByteArray> roleNames() const override;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual QVariant data(const QModelIndex &index, int role) const override;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    virtual QHash<int, QByteArray> roleNames() const override;
 
-  Q_INVOKABLE Sensor addSensor(QString name = QString(), double input = 0.0,
-                               double threshold = 100.0,
-                               bool isTriggered = false,
-                               QString layer = "Layer 1", double x = 0.0,
-                               double y = 0.0);
+    Q_INVOKABLE Sensor addSensor(QString name = QString(),
+                                 double input = 0.0,
+                                 double threshold = 100.0,
+                                 bool isTriggered = false,
+                                 QString layer = "Layer 1",
+                                 double x = 0.0,
+                                 double y = 0.0);
 
-  Q_INVOKABLE bool removeSensor(const QUuid &id);
-  Q_INVOKABLE void clear();
+    Q_INVOKABLE bool removeSensor(const QUuid &id);
+    Q_INVOKABLE void clear();
 
-  Q_INVOKABLE int getIndexFromId(const QUuid &id) const;
-  Q_INVOKABLE Sensor getSensorById(const QUuid &id) const;
-  Q_INVOKABLE int getIndexByName(const QString &name) const;
-  QList<Sensor> getAllSensors() const { return m_sensors; }
+    Q_INVOKABLE int getIndexFromId(const QUuid &id) const;
+    Q_INVOKABLE Sensor getSensorById(const QUuid &id) const;
+    Q_INVOKABLE int getIndexByName(const QString &name) const;
+    QList<Sensor> getAllSensors() const { return m_sensors; }
 
 signals:
-  void sensorAdded(const QUuid &id, const QString &name, double input,
-                   double threshold, const bool &isTriggered,
-                   const QString &layer, double x, double y);
-  void sensorRemoved(const QUuid &id);
-  void sensorUpdated(const QUuid &id, const QString &name, double input,
-                     double threshold, const bool &isTriggered,
-                     const QString &layer, double x, double y);
-  void layersChanged();
+    void sensorAdded(const QUuid &id,
+                     const QString &name,
+                     double input,
+                     double threshold,
+                     const bool &isTriggered,
+                     const QString &layer,
+                     double x,
+                     double y);
+    void sensorRemoved(const QUuid &id);
+    void sensorUpdated(const QUuid &id,
+                       const QString &name,
+                       double input,
+                       double threshold,
+                       const bool &isTriggered,
+                       const QString &layer,
+                       double x,
+                       double y);
+    void layersChanged();
 
 private:
-  QList<Sensor> m_sensors;
-  QList<QString> m_layers;
+    QList<Sensor> m_sensors;
+    QList<QString> m_layers;
 };
 
 #endif // SENSORMODEL_H

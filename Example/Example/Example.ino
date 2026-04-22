@@ -9,8 +9,8 @@ struct Sensor {
   float threshold; // booleans also work (bool gets automatically parsed as 0.0
                    // or 1.0) // If not given then app will show as "-1"
   String layer;
-  int x; // if not given then app will show as 0
-  int y; // if not given then app will show as 0
+  double x; // if not given then app will show as 0
+  double y; // if not given then app will show as 0
 
   bool isTriggered() const {
     if (operatorStr == ">=")

@@ -1,6 +1,7 @@
 import QtQuick
 import "qml"
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Material
 import com.Roboticus.ControlCenter
 
 //TODO: note to self, column.selectedSensor/onClicked is unused, possible to use for something else? idk
