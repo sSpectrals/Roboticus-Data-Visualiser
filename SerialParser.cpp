@@ -33,9 +33,14 @@ Q_INVOKABLE bool SerialParser::connectToPort()
     bool success = m_serial.open(QIODevice::ReadOnly);
 
     if (success) {
-        m_serial.setDataTerminalReady(false);
 
-        // Clear any startup garbage (null bytes from Arduino reset)
+        #ifdef Q_OS_WIN
+                m_serial.setDataTerminalReady(false);
+        #else
+                m_serial.setDataTerminalReady(true);
+        #endif
+
+                // Clear any startup garbage (null bytes from Arduino reset)
         m_buffer.clear();
         m_serial.clear();
 
