@@ -1,7 +1,6 @@
 #include "RoboticusDebugger.h"
-#include <ArduinoJson.h> // Important note the syntax used in this example is ArduinoJson V7
 
-RoboticusDebugger debugger;
+RoboticusDebugger debugger(Serial);
 
 // Create arrays of sensors  ||  name | input | operatorStr | threshold | x | y
 Sensor sensors[] = {
