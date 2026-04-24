@@ -81,9 +81,11 @@ void RoboticusDebugger::write() {
   if (!_hasData)
     return;
 
-  _doc.shrinkToFit();
+  _doc.shrinkToFit(); // This is optional according to ArduinoJson docs,
+                      // decreases memory usage by a lot.
   serializeJson(_doc, _output);
-  _output.println();
+  _output.println(); // IMPORTANT!! The app parses the json with a new line as a
+                     // delimiter between frames, so this is required.
   _hasData = false;
 }
 

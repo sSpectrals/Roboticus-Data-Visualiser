@@ -1,42 +1,7 @@
+#include "RoboticusDebugger.h"
 #include <ArduinoJson.h> // Important note the syntax used in this example is ArduinoJson V7
 
-// Define structs for the data types
-struct Sensor {
-  String name; // if not given then app will show as "no name given"
-  float input; // booleans also work (bool gets automatically parsed as 0.0
-               // or 1.0) // If not given then app will show as "-1"
-  String operatorStr;
-  float threshold; // booleans also work (bool gets automatically parsed as 0.0
-                   // or 1.0) // If not given then app will show as "-1"
-  String layer;
-  double x; // if not given then app will show as 0
-  double y; // if not given then app will show as 0
-
-  bool isTriggered() const {
-    if (operatorStr == ">=")
-      return input >= threshold;
-    if (operatorStr == "<=")
-      return input <= threshold;
-    if (operatorStr == ">")
-      return input > threshold;
-    if (operatorStr == "<")
-      return input < threshold;
-    if (operatorStr == "==")
-      return input == threshold;
-    if (operatorStr == "!=")
-      return input != threshold;
-    return false; // Invalid operator
-  }
-};
-
-struct Vector {
-  String name;
-  float rotation;
-  String color;
-  String layer;
-  int x;
-  int y;
-};
+RoboticusDebugger debugger;
 
 // Create arrays of sensors  ||  name | input | operatorStr | threshold | x | y
 Sensor sensors[] = {
@@ -100,56 +65,25 @@ const int numVectors = sizeof(vectors) / sizeof(vectors[0]);
 void setup() { Serial.begin(115200); }
 
 void loop() {
-  JsonDocument doc;
-  doc["timestamp"] = millis();
-
-  // Add sensors array
-  JsonArray sensorsArray = doc["sensors"].to<JsonArray>();
 
   for (int i = 0; i < numSensors; i++) {
-    // Add object to array
-    JsonObject sensorObj = sensorsArray.add<JsonObject>();
-    sensorObj["name"] = sensors[i].name;
-    sensorObj["input"] = sensors[i].input;
-    sensorObj["isTriggered"] = sensors[i].isTriggered();
-    sensorObj["threshold"] = sensors[i].threshold;
-    sensorObj["layer"] = sensors[i].layer;
-
-    JsonObject location = sensorObj["location"].to<JsonObject>();
-    location["x"] = sensors[i].x;
-    location["y"] = sensors[i].y;
+    // Add every sensor object to the debugger
+    debugger.add(sensors[i]);
   }
-
-  // Add vectors array
-  JsonArray vectorsArray = doc["vectors"].to<JsonArray>();
 
   for (int i = 0; i < numVectors; i++) {
-    // Add object to array
-    JsonObject vectorObj = vectorsArray.add<JsonObject>();
-    vectorObj["name"] = vectors[i].name;
-    vectorObj["rotation"] = vectors[i].rotation;
-    vectorObj["color"] = vectors[i].color;
-    vectorObj["layer"] = vectors[i].layer;
-
-    JsonObject location = vectorObj["location"].to<JsonObject>();
-    location["x"] = vectors[i].x;
-    location["y"] = vectors[i].y;
+    // Add every vector object to the debugger
+    debugger.add(vectors[i]);
   }
 
+  // emulating changes in sensor inputs and vector rotations for demonstration
+  // purposes
   for (int i = 0; i < numSensors; i++) {
     sensors[i].input += 1.0;
   }
-
   vectors[0].rotation += 1.0;
   vectors[1].rotation += 3.0;
   vectors[2].rotation += 9.0;
 
-  // This is optional according to ArduinoJson docs, decreases memory usage by a
-  // lot.
-  doc.shrinkToFit();
-
-  serializeJson(doc, Serial);
-  Serial.println(); // IMPORTANT!! The app parses the json with a new line as a
-                    // delimiter, without this line the app will not be able to
-                    // parse the json correctly
+  debugger.write(); // Send the frame to the app and clear for next frame
 }
