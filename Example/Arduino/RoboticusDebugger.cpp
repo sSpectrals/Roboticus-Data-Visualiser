@@ -21,7 +21,6 @@ RoboticusDebugger::RoboticusDebugger(Print &output)
 
 void RoboticusDebugger::begin() {
   _doc.clear();
-  _doc["timestamp"] = millis();
   _sensorsArray = _doc["sensors"].to<JsonArray>();
   _vectorsArray = _doc["vectors"].to<JsonArray>();
   _hasData = true;
@@ -80,6 +79,8 @@ void RoboticusDebugger::add(const Vector &vector) {
 void RoboticusDebugger::write() {
   if (!_hasData)
     return;
+
+  _doc["timestamp"] = millis();
 
   _doc.shrinkToFit(); // This is optional according to ArduinoJson docs,
                       // decreases memory usage by a lot.
