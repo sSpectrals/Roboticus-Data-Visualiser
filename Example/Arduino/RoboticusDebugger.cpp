@@ -21,8 +21,8 @@ RoboticusDebugger::RoboticusDebugger(Print &output)
 
 void RoboticusDebugger::begin() {
   _doc.clear();
-  _sensorsArray = _doc["sensors"].to<JsonArray>();
-  _vectorsArray = _doc["vectors"].to<JsonArray>();
+  _sensorsArray = _doc[0].to<JsonArray>();
+  _vectorsArray = _doc[1].to<JsonArray>();
   _hasData = true;
 }
 
@@ -50,49 +50,53 @@ void RoboticusDebugger::add(const Sensor &sensor) {
   if (!_hasData)
     begin();
 
-  JsonObject obj = _sensorsArray.add<JsonObject>();
-  obj["name"] = sensor.name;
-  obj["input"] = round(sensor.input * 100.0) / 100.0;
-  obj["isTriggered"] = sensor.isTriggered();
-  obj["threshold"] = sensor.threshold;
-  obj["layer"] = sensor.layer;
-
-  JsonObject loc = obj["location"].to<JsonObject>();
-  loc["x"] = sensor.x;
-  loc["y"] = sensor.y;
+  JsonArray obj = _sensorsArray.add<JsonArray>();
+  // [0]=name [1]=input [2]=isTriggered [3]=threshold [4]=layer [5]=x [6]=y
+  obj.add(sensor.name);
+  obj.add(sensor.input);
+  obj.add(sensor.isTriggered());
+  obj.add(sensor.threshold);
+  obj.add(sensor.layer);
+  obj.add(sensor.x);
+  obj.add(sensor.y);
 }
 
 void RoboticusDebugger::add(const Vector &vector) {
   if (!_hasData)
     begin();
 
-  JsonObject obj = _vectorsArray.add<JsonObject>();
-  obj["name"] = vector.name;
-  obj["rotation"] = vector.rotation;
-  obj["color"] = vector.color;
-  obj["layer"] = vector.layer;
-
-  JsonObject loc = obj["location"].to<JsonObject>();
-  loc["x"] = vector.x;
-  loc["y"] = vector.y;
+  JsonArray obj = _vectorsArray.add<JsonArray>();
+  // [0]=name [1]=rotation [2]=color [3]=layer [4]=x [5]=y
+  obj.add(vector.name);
+  obj.add(vector.rotation);
+  obj.add(vector.color);
+  obj.add(vector.layer);
+  obj.add(vector.x);
+  obj.add(vector.y);
 }
 void RoboticusDebugger::write() {
   if (!_hasData)
     return;
 
-  _doc["timestamp"] = millis();
+  _doc[2] = millis();
   _doc.shrinkToFit();
 
   size_t msgSize = measureMsgPack(_doc);
 
-  // Explicitly send Little Endian: [Low Byte, High Byte]
   uint8_t header[3];
-  header[0] = 0xFD;                             //
-  header[1] = (uint8_t)(msgSize & 0xFF);        // Low byte
-  header[2] = (uint8_t)((msgSize >> 8) & 0xFF); // High byte
+  header[0] = 0xFD;
+  header[1] = (uint8_t)(msgSize & 0xFF);
+  header[2] = (uint8_t)((msgSize >> 8) & 0xFF);
 
+  // unsigned long start = micros(); // Start timer
   _output.write(header, 3);
   serializeMsgPack(_doc, _output);
+  // unsigned long end = micros(); // End timer
+
+  // Serial.print("Time (us): ");
+  // Serial.println(end - start);
+  // Serial.print("Bytes: ");
+  // Serial.println(msgSize);
 
   _hasData = false;
 }

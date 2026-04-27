@@ -9,8 +9,8 @@ struct Sensor {
   String operatorStr;
   float threshold;
   String layer;
-  double x;
-  double y;
+  float x;
+  float y;
 
   // compares input and threshold using operatorStr and returns result
   bool isTriggered() const;
@@ -21,8 +21,8 @@ struct Vector {
   float rotation;
   String color;
   String layer;
-  int x;
-  int y;
+  float x;
+  float y;
 };
 
 class RoboticusDebugger {
