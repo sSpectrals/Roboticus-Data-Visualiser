@@ -12,7 +12,7 @@ qt_add_executable(appRoboticus_control_center
     main.cpp
 )
 
-
+add_subdirectory(libs/qmsgpack)
 
 qt_add_qml_module(appRoboticus_control_center
     URI com.Roboticus.ControlCenter
@@ -61,7 +61,7 @@ set_target_properties(appRoboticus_control_center PROPERTIES
 )
 
 target_link_libraries(appRoboticus_control_center
-    PRIVATE Qt6::Quick Qt6::Graphs Qt6::SerialPort Qt6::Gui
+    PRIVATE Qt6::Quick Qt6::Graphs Qt6::SerialPort Qt6::Gui qmsgpack
 )
 
 include(GNUInstallDirs)
