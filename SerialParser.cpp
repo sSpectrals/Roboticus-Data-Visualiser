@@ -173,163 +173,168 @@ void SerialParser::readData() {
   if (m_buffer.size() > maxBufferSize) {
     qDebug() << "Buffer overflow, keeping last 4KB";
     m_buffer = m_buffer.right(4096);
+    int syncPos = m_buffer.indexOf((char)0xFD);
+    if (syncPos > 0)
+      m_buffer.remove(0, syncPos);
+    else if (syncPos == -1)
+      m_buffer.clear();
   }
 
-  // Process all complete lines (newline-delimited JSON)
   while (m_buffer.size() >= 3) {
 
-      if (static_cast<uint8_t>(m_buffer.at(0)) != 0xFD) {
-           qDebug() << "Searching for 0xFD, found:" << QString::number(static_cast<uint8_t>(m_buffer.at(0)), 16);
-          m_buffer.remove(0, 1);
-          continue; // Keep looking
-      }
+    // Find sync byte (0xFD) - this indicates the start of a packet
+    if (static_cast<uint8_t>(m_buffer.at(0)) != 0xFD) {
+      m_buffer.remove(0, 1);
+      continue; // Keep looking
+    }
 
     // Peek at the first 2 bytes to get the payload size
-    // We use quint16 to match the uint16_t sent from the Arduino
-      const unsigned char* ptr = reinterpret_cast<const unsigned char*>(m_buffer.constData());
-      quint16 payloadSize = ptr[1] | (ptr[2] << 8);
 
-      if (payloadSize == 0 || payloadSize > 10000) {
+    const unsigned char *ptr =
+        reinterpret_cast<const unsigned char *>(m_buffer.constData());
+    quint16 payloadSize = ptr[1] | (ptr[2] << 8);
 
-          m_buffer.remove(0, 1); // Not a real header, move on
-          continue;
-      }
+    if (payloadSize == 0 || payloadSize > 10000) {
 
-    // 3. Check if the full payload has arrived
-    // Total packet size = 2 (header) + payloadSize (msgpack data)
+      m_buffer.remove(0, 1); // Not a real header, move on
+      continue;
+    }
+
+    // Check if the full payload has arrived
+    // Total packet size = 3 (header) + payloadSize
     if (m_buffer.size() < (3 + payloadSize)) {
       // Not enough data yet, exit the loop and wait for more
       break;
     }
 
-    // 4. Extract the payload (skipping the 2-byte header)
+    // Extract the payload (skipping the 2-byte header)
     QByteArray msgpackData = m_buffer.mid(3, payloadSize);
 
-    // 5. Remove the processed packet from the buffer
+    // Remove the processed packet from the buffer
     m_buffer.remove(0, 3 + payloadSize);
 
     emit dataReceived(msgpackData);
-
-    // 6. Send to the MessagePack processor
     processMsgPackData(msgpackData);
   }
 }
 
 void SerialParser::processMsgPackData(const QByteArray &data) {
-    QVariant unpacked = MsgPack::unpack(data);
+  QVariant unpacked = MsgPack::unpack(data);
 
-    if (!unpacked.isValid() || unpacked.isNull()) {
-        qDebug() << "Failed to unpack MessagePack data: Data is invalid or null.";
-        return;
-    }
+  if (!unpacked.isValid() || unpacked.isNull()) {
+    qDebug() << "Failed to unpack MessagePack data: Data is invalid or null.";
+    return;
+  }
 
-    QVariantMap frame = unpacked.toMap();
+  QVariantList frame = unpacked.toList();
+  if (frame.size() < 3) {
+    qDebug() << "Malformed frame: expected 3 top-level elements";
+    return;
+  }
+  QVariantList sensorsList = frame.at(0).toList();
+  QVariantList vectorsList = frame.at(1).toList();
+  qint64 timestamp = frame.at(2).toLongLong();
 
-    // 2. Extract the Timestamp
-    // MsgPack stores integers efficiently; toLongLong handles the conversion safely.
-    qint64 timestamp = frame.value("timestamp").toLongLong();
+  if (sensorsList.isEmpty() && vectorsList.isEmpty()) {
+    qDebug() << "Frame contains no sensors or vectors";
+    return;
+  }
 
-    // 3. Create a FrameSnapshot for your timeline/replay system
-    FrameSnapshot snapshot;
-    snapshot.timestamp = timestamp;
+  if (!sensorsList.isEmpty())
+    updateSensorsFromVariant(sensorsList);
 
-    // Note: We pull existing data from models to save the "state" at this timestamp
-    snapshot.sensors = m_sensorModel ? m_sensorModel->getAllSensors() : QList<Sensor>();
-    snapshot.vectors = m_vectorModel ? m_vectorModel->getAllVectors() : QList<Vector>();
+  if (!vectorsList.isEmpty())
+    updateVectorsFromVariant(vectorsList);
 
-    m_snapshots.append(snapshot);
-    emit snapshotsChanged();
+  // Save snapshot
+  FrameSnapshot snapshot;
+  snapshot.timestamp = timestamp;
+  snapshot.sensors =
+      m_sensorModel ? m_sensorModel->getAllSensors() : QList<Sensor>();
+  snapshot.vectors =
+      m_vectorModel ? m_vectorModel->getAllVectors() : QList<Vector>();
 
-    // 4. Update Sensors
-    if (frame.contains("sensors")) {
-        // QJsonArray becomes QVariantList in MsgPack
-        updateSensorsFromVariant(frame.value("sensors").toList());
-    }
-
-    // 5. Update Vectors
-    if (frame.contains("vectors")) {
-        updateVectorsFromVariant(frame.value("vectors").toList());
-    }
+  m_snapshots.append(snapshot);
+  emit snapshotsChanged();
 }
 
-void SerialParser::updateSensorsFromVariant(const QVariantList &sensors)
-{
-    if (!m_sensorModel) return;
+void SerialParser::updateSensorsFromVariant(const QVariantList &sensors) {
+  if (!m_sensorModel)
+    return;
 
-    for (const QVariant &sensorVar : sensors) {
-        QVariantMap sensorObj = sensorVar.toMap();
-        QString name = sensorObj.value("name").toString();
-
-        // Handle the logic for booleans vs doubles in threshold/input
-        QVariant thresholdVar = sensorObj.value("threshold");
-        double threshold = (thresholdVar.typeId() == QMetaType::Bool)
-                               ? (thresholdVar.toBool() ? 1.0 : 0.0)
-                               : thresholdVar.toDouble();
-
-        QVariant inputVar = sensorObj.value("input");
-        double input = (inputVar.typeId() == QMetaType::Bool)
-                           ? (inputVar.toBool() ? 1.0 : 0.0)
-                           : inputVar.toDouble();
-
-        bool isTriggered = sensorObj.value("isTriggered").toBool();
-        QString layer = sensorObj.value("layer").toString();
-
-        // Location is a nested Map
-        QVariantMap location = sensorObj.value("location").toMap();
-        double x = location.value("x").toDouble();
-        double y = location.value("y").toDouble();
-
-        int idx = m_sensorModel->getIndexByName(name);
-        if (idx >= 0) {
-            QModelIndex modelIdx = m_sensorModel->index(idx);
-            m_sensorModel->setData(modelIdx, input, SensorModel::InputRole);
-            m_sensorModel->setData(modelIdx, threshold, SensorModel::ThresholdRole);
-            m_sensorModel->setData(modelIdx, isTriggered, SensorModel::TriggerRole);
-            m_sensorModel->setData(modelIdx, x, SensorModel::XRole);
-            m_sensorModel->setData(modelIdx, y, SensorModel::YRole);
-            m_sensorModel->setData(modelIdx, layer, SensorModel::LayerRole);
-        } else {
-            m_sensorModel->addSensor(name, input, threshold, isTriggered, layer, x, y);
-        }
+  for (const QVariant &sensorVar : sensors) {
+    // [0]=name [1]=input [2]=isTriggered [3]=threshold [4]=layer [5]=x [6]=y
+    QVariantList s = sensorVar.toList();
+    if (s.size() < 7) {
+      qDebug() << "Malformed sensor entry, skipping";
+      continue;
     }
+
+    QString name = s.at(0).toString();
+    double input = roundTo2Decimals(s.at(1).toFloat());
+    bool isTriggered = s.at(2).toBool();
+    double threshold = roundTo2Decimals(s.at(3).toFloat());
+    QString layer = s.at(4).toString();
+    double x = roundTo2Decimals(s.at(5).toFloat());
+    double y = roundTo2Decimals(s.at(6).toFloat());
+
+
+
+
+    int idx = m_sensorModel->getIndexByName(name);
+    if (idx >= 0) {
+      QModelIndex modelIdx = m_sensorModel->index(idx);
+      m_sensorModel->setData(modelIdx, input, SensorModel::InputRole);
+      m_sensorModel->setData(modelIdx, threshold, SensorModel::ThresholdRole);
+      m_sensorModel->setData(modelIdx, isTriggered, SensorModel::TriggerRole);
+      m_sensorModel->setData(modelIdx, x, SensorModel::XRole);
+      m_sensorModel->setData(modelIdx, y, SensorModel::YRole);
+      m_sensorModel->setData(modelIdx, layer, SensorModel::LayerRole);
+    } else {
+      m_sensorModel->addSensor(name, input, threshold, isTriggered, layer, x,
+                               y);
+    }
+  }
 }
 
-void SerialParser::updateVectorsFromVariant(const QVariantList &vectors)
-{
-    if (!m_vectorModel)
-        return;
+void SerialParser::updateVectorsFromVariant(const QVariantList &vectors) {
+  if (!m_vectorModel)
+    return;
 
-    for (const QVariant &vectorVar : vectors) {
-        QVariantMap vectorObj = vectorVar.toMap();
-
-        // 1. Extract data using keys defined in your Arduino RoboticusDebugger
-        QString name = vectorObj.value("name").toString();
-        double rotation = vectorObj.value("rotation").toDouble();
-        QString color = vectorObj.value("color").toString();
-        QString layer = vectorObj.value("layer").toString();
-
-        // 2. Location is a nested Map in your Arduino code
-        QVariantMap location = vectorObj.value("location").toMap();
-        double x = location.value("x").toDouble();
-        double y = location.value("y").toDouble();
-
-        // 3. Find existing vector by name or add a new one
-        int idx = m_vectorModel->getIndexByName(name);
-
-        if (idx >= 0) {
-            // Update existing vector in the model
-            QModelIndex modelIdx = m_vectorModel->index(idx);
-            m_vectorModel->setData(modelIdx, rotation, VectorModel::RotationRole);
-            m_vectorModel->setData(modelIdx, color, VectorModel::ColorRole);
-            m_vectorModel->setData(modelIdx, x, VectorModel::XRole);
-            m_vectorModel->setData(modelIdx, y, VectorModel::YRole);
-            m_vectorModel->setData(modelIdx, layer, VectorModel::LayerRole);
-        } else {
-            // Add new vector if it doesn't exist yet
-            // Assuming magnitude is 1.0 for visualization
-            m_vectorModel->addVector(name, rotation, 1.0, QColor(color), layer, x, y);
-        }
+  for (const QVariant &vectorVar : vectors) {
+    // [0]=name [1]=rotation [2]=color [3]=layer [4]=x [5]=y
+    QVariantList v = vectorVar.toList();
+    if (v.size() < 6) {
+      qDebug() << "Malformed vector entry, skipping";
+      continue;
     }
+
+    QString name = v.at(0).toString();
+    double rotation = roundTo2Decimals(v.at(1).toFloat());
+    QString color = v.at(2).toString();
+    QString layer = v.at(3).toString();
+    double x = roundTo2Decimals(v.at(4).toFloat());
+    double y = roundTo2Decimals(v.at(5).toFloat());
+
+    int idx = m_vectorModel->getIndexByName(name);
+    if (idx >= 0) {
+      // Update existing vector in the model
+      QModelIndex modelIdx = m_vectorModel->index(idx);
+      m_vectorModel->setData(modelIdx, rotation, VectorModel::RotationRole);
+      m_vectorModel->setData(modelIdx, color, VectorModel::ColorRole);
+      m_vectorModel->setData(modelIdx, x, VectorModel::XRole);
+      m_vectorModel->setData(modelIdx, y, VectorModel::YRole);
+      m_vectorModel->setData(modelIdx, layer, VectorModel::LayerRole);
+    } else {
+      // Add new vector if it doesn't exist yet
+      // Assuming magnitude is 1.0 for visualization
+      m_vectorModel->addVector(name, rotation, 1.0, QColor(color), layer, x, y);
+    }
+  }
+}
+
+double SerialParser::roundTo2Decimals(float value) {
+    return qRound(value * 100) / 100.0;
 }
 
 Q_INVOKABLE qint64 SerialParser::timestampAt(int index) const {

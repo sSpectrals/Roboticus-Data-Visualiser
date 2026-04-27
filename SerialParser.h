@@ -85,6 +85,7 @@ private:
   void updateVectorsFromVariant(const QVariantList &vectors);
   void updateSensorsFromJson(const QJsonArray &sensors);
   void updateVectorsFromJson(const QJsonArray &vectors);
+  double roundTo2Decimals(float val);
   QStringList availablePorts();
 };
 
