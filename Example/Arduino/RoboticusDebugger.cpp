@@ -28,7 +28,7 @@ void RoboticusDebugger::begin() {
 
 void RoboticusDebugger::addSensor(const String &name, float input,
                                   const String &operatorStr, float threshold,
-                                  const String &layer, double x, double y) {
+                                  const String &layer, float x, float y) {
   if (!_hasData)
     begin();
 
@@ -38,7 +38,7 @@ void RoboticusDebugger::addSensor(const String &name, float input,
 
 void RoboticusDebugger::addVector(const String &name, float rotation,
                                   const String &color, const String &layer,
-                                  int x, int y) {
+                                  float x, float y) {
   if (!_hasData)
     begin();
 

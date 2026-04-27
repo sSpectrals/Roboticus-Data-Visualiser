@@ -67,9 +67,9 @@ public:
    * not given then app will show as 0
    */
   void addSensor(const String &name, float input, const String &operatorStr,
-                 float threshold, const String &layer, double x, double y);
+                 float threshold, const String &layer, float x, float y);
   void addVector(const String &name, float rotation, const String &color,
-                 const String &layer, int x, int y);
+                 const String &layer, float x, float y);
 
   // Send current frame and clear for next
   void write();
