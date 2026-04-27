@@ -60,6 +60,8 @@ set_target_properties(appRoboticus_control_center PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+target_include_directories(appRoboticus_control_center PRIVATE libs)
+
 target_link_libraries(appRoboticus_control_center
     PRIVATE Qt6::Quick Qt6::Graphs Qt6::SerialPort Qt6::Gui qmsgpack
 )
