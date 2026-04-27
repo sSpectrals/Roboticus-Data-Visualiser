@@ -52,7 +52,7 @@ void RoboticusDebugger::add(const Sensor &sensor) {
 
   JsonObject obj = _sensorsArray.add<JsonObject>();
   obj["name"] = sensor.name;
-  obj["input"] = sensor.input;
+  obj["input"] = round(sensor.input * 100.0) / 100.0;
   obj["isTriggered"] = sensor.isTriggered();
   obj["threshold"] = sensor.threshold;
   obj["layer"] = sensor.layer;
@@ -81,14 +81,17 @@ void RoboticusDebugger::write() {
     return;
 
   _doc["timestamp"] = millis();
-  _doc.shrinkToFit(); // This is optional according to ArduinoJson docs,
-                      // decreases memory usage by a lot.
+  _doc.shrinkToFit();
 
   size_t msgSize = measureMsgPack(_doc);
 
-  uint16_t header = (uint16_t)msgSize;
-  _output.write((uint8_t *)&header, 2);
+  // Explicitly send Little Endian: [Low Byte, High Byte]
+  uint8_t header[3];
+  header[0] = 0xFD;                             //
+  header[1] = (uint8_t)(msgSize & 0xFF);        // Low byte
+  header[2] = (uint8_t)((msgSize >> 8) & 0xFF); // High byte
 
+  _output.write(header, 3);
   serializeMsgPack(_doc, _output);
 
   _hasData = false;
