@@ -176,25 +176,37 @@ void SerialParser::readData() {
   }
 
   // Process all complete lines (newline-delimited JSON)
-  while (m_buffer.size() >= 2) {
+  while (m_buffer.size() >= 3) {
+
+      if (static_cast<uint8_t>(m_buffer.at(0)) != 0xFD) {
+           qDebug() << "Searching for 0xFD, found:" << QString::number(static_cast<uint8_t>(m_buffer.at(0)), 16);
+          m_buffer.remove(0, 1);
+          continue; // Keep looking
+      }
 
     // Peek at the first 2 bytes to get the payload size
     // We use quint16 to match the uint16_t sent from the Arduino
-    quint16 payloadSize;
-    memcpy(&payloadSize, m_buffer.constData(), 2);
+      const unsigned char* ptr = reinterpret_cast<const unsigned char*>(m_buffer.constData());
+      quint16 payloadSize = ptr[1] | (ptr[2] << 8);
+
+      if (payloadSize == 0 || payloadSize > 10000) {
+
+          m_buffer.remove(0, 1); // Not a real header, move on
+          continue;
+      }
 
     // 3. Check if the full payload has arrived
     // Total packet size = 2 (header) + payloadSize (msgpack data)
-    if (m_buffer.size() < (2 + payloadSize)) {
+    if (m_buffer.size() < (3 + payloadSize)) {
       // Not enough data yet, exit the loop and wait for more
       break;
     }
 
     // 4. Extract the payload (skipping the 2-byte header)
-    QByteArray msgpackData = m_buffer.mid(2, payloadSize);
+    QByteArray msgpackData = m_buffer.mid(3, payloadSize);
 
     // 5. Remove the processed packet from the buffer
-    m_buffer.remove(0, 2 + payloadSize);
+    m_buffer.remove(0, 3 + payloadSize);
 
     emit dataReceived(msgpackData);
 
