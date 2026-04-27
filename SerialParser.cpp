@@ -10,6 +10,9 @@ SerialParser::SerialParser(QObject *parent) : QObject(parent) {
   connect(&m_portRefreshTimer, &QTimer::timeout, this,
           &SerialParser::refreshPorts);
   m_portRefreshTimer.start(1000);
+
+  connect(&m_serial, &QSerialPort::errorOccurred, this,
+          &SerialParser::handleSerialError);
 }
 
 Q_INVOKABLE bool SerialParser::connectToPort() {
@@ -120,6 +123,24 @@ void SerialParser::disconnectPort() {
     m_serial.close();
     emit connectionChanged();
     qDebug() << "Disconnected from" << m_serial.portName();
+  }
+}
+
+void SerialParser::handleSerialError(QSerialPort::SerialPortError error) {
+  if (error == QSerialPort::NoError) {
+    return;
+  }
+
+  if (!m_serial.isOpen()) {
+    return;
+  }
+
+  if (error == QSerialPort::ResourceError ||
+      error == QSerialPort::DeviceNotFoundError) {
+    qDebug() << "Serial connection lost:" << m_serial.errorString();
+    m_serial.close();
+    emit connectionChanged();
+    emit errorOccurred("Serial connection lost. Please reconnect the device.");
   }
 }
 
@@ -278,9 +299,6 @@ void SerialParser::updateSensorsFromVariant(const QVariantList &sensors) {
     double x = roundTo2Decimals(s.at(5).toFloat());
     double y = roundTo2Decimals(s.at(6).toFloat());
 
-
-
-
     int idx = m_sensorModel->getIndexByName(name);
     if (idx >= 0) {
       QModelIndex modelIdx = m_sensorModel->index(idx);
@@ -334,7 +352,7 @@ void SerialParser::updateVectorsFromVariant(const QVariantList &vectors) {
 }
 
 double SerialParser::roundTo2Decimals(float value) {
-    return qRound(value * 100) / 100.0;
+  return qRound(value * 100) / 100.0;
 }
 
 Q_INVOKABLE qint64 SerialParser::timestampAt(int index) const {

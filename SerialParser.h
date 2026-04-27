@@ -79,6 +79,7 @@ private:
   VectorModel *m_vectorModel = nullptr;
 
   void configureDefaultSettings();
+  void handleSerialError(QSerialPort::SerialPortError error);
   void processJsonData(const QByteArray &jsonData);
   void processMsgPackData(const QByteArray &jsonData);
   void updateSensorsFromVariant(const QVariantList &sensors);
