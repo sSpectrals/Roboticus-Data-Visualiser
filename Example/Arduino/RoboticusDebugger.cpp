@@ -81,12 +81,16 @@ void RoboticusDebugger::write() {
     return;
 
   _doc["timestamp"] = millis();
-
   _doc.shrinkToFit(); // This is optional according to ArduinoJson docs,
                       // decreases memory usage by a lot.
-  serializeJson(_doc, _output);
-  _output.println(); // IMPORTANT!! The app parses the json with a new line as a
-                     // delimiter between frames, so this is required.
+
+  size_t msgSize = measureMsgPack(_doc);
+
+  uint16_t header = (uint16_t)msgSize;
+  _output.write((uint8_t *)&header, 2);
+
+  serializeMsgPack(_doc, _output);
+
   _hasData = false;
 }
 
