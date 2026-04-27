@@ -1,7 +1,7 @@
-import json
 import sys
 import time
- 
+import struct
+import msgpack # pip install msgpack
  
 _START_TIME = time.monotonic()
  
@@ -13,8 +13,8 @@ class Sensor:
         self.operator_str = operator_str
         self.threshold = float(threshold)
         self.layer = layer
-        self.x = x
-        self.y = y
+        self.x = float(x)
+        self.y = float(y)
  
     def is_triggered(self) -> bool:
         ops = {
@@ -30,27 +30,27 @@ class Sensor:
  
 class Vector:
     def __init__(self, name: str, rotation: float, color: str,
-                 layer: str, x: int, y: int):
+                 layer: str, x: float, y: float):
         self.name = name
-        self.rotation = rotation
+        self.rotation = float(rotation)
         self.color = color
         self.layer = layer
-        self.x = x
-        self.y = y
+        self.x = float(x)
+        self.y = float(y)
  
  
 class RoboticusDebugger:
     def __init__(self, output=None):
         self._output = output
-        self._sensors: list[dict] = []
-        self._vectors: list[dict] = []
+        self._sensors: list = []
+        self._vectors: list = []
         self._has_data = False
  
     def add(self, item):
         if isinstance(item, Sensor):
-            self._add_sensor_to_json(item)
+            self._add_sensor_to_pack(item)
         elif isinstance(item, Vector):
-            self._add_vector_to_json(item)
+            self._add_vector_to_pack(item)
         else:
             raise TypeError(f"Expected Sensor or Vector, got {type(item)}")
  
@@ -64,22 +64,20 @@ class RoboticusDebugger:
         if not self._has_data:
             return
  
-        frame = {
-            "timestamp": self._millis(),
-            "sensors":   self._sensors,
-            "vectors":   self._vectors,
-        }
+        frame = [self._sensors, self._vectors, self._millis()]
  
-        line = json.dumps(frame, separators=(",", ":")) + "\n"
+        payload = msgpack.packb(frame, use_single_float=True, use_bin_type=True)
+        size = len(payload)
+        header = bytes([0xFD, size & 0xFF, (size >> 8) & 0xFF])
+        
+        out = header + payload
  
         if self._output is None:
-            sys.stdout.write(line)
-            sys.stdout.flush()
+            sys.stdout.buffer.write(out)
+            sys.stdout.buffer.flush()
         else:
-            try:
-                self._output.write(line.encode())
-            except TypeError:
-                self._output.write(line)
+            self._output.write(out)
+            
  
         self._reset()
  
@@ -91,25 +89,29 @@ class RoboticusDebugger:
         self._vectors = []
         self._has_data = False
  
-    def _add_sensor_to_json(self, s: Sensor):
-        self._sensors.append({
-            "name":        s.name,
-            "input":       s.input,
-            "isTriggered": s.is_triggered(),
-            "threshold":   s.threshold,
-            "layer":       s.layer,
-            "location":    {"x": s.x, "y": s.y},
-        })
+    def _add_sensor_to_pack(self, s: Sensor):
+        # [0]=name [1]=input [2]=isTriggered [3]=threshold [4]=layer [5]=x [6]=y
+        self._sensors.append([
+            s.name,
+            s.input,
+            s.is_triggered(),
+            s.threshold,
+            s.layer,
+            s.x,
+            s.y,
+        ])
         self._has_data = True
  
-    def _add_vector_to_json(self, v: Vector):
-        self._vectors.append({
-            "name":     v.name,
-            "rotation": v.rotation,
-            "color":    v.color,
-            "layer":    v.layer,
-            "location": {"x": v.x, "y": v.y},
-        })
+    def _add_vector_to_pack(self, v: Vector):
+        # [0]=name [1]=rotation [2]=color [3]=layer [4]=x [5]=y
+        self._vectors.append([
+            v.name,
+            v.rotation,
+            v.color,
+            v.layer,
+            v.x,
+            v.y,
+        ])
         self._has_data = True
  
     @staticmethod

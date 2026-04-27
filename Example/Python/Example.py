@@ -4,7 +4,7 @@ from RoboticusDebugger import RoboticusDebugger, Sensor, Vector
 #    port = None for simple print
 #    port = serial.Serial("COM3", 115200)        # Windows
 #    port = serial.Serial("/dev/ttyUSB0", 115200) # Linux / macOS
-port = serial.Serial("/dev/ttyS10", 115200)
+port = None
 
 debugger = RoboticusDebugger(output=port)
 
