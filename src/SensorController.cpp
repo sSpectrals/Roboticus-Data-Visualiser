@@ -1,4 +1,5 @@
 #include "SensorController.h"
+#include "controllers/ControllerUtils.h"
 #include <QDebug>
 
 SensorController::SensorController(QObject *parent)
@@ -40,61 +41,30 @@ Q_INVOKABLE bool SensorController::removeSensor(const QUuid &id)
 
 Q_INVOKABLE bool SensorController::setSensorValue(const QUuid &id, double value)
 {
-    if (!m_model)
-        return false;
-
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(QString("Attempted to set value for non-existent sensor with id: %1")
-                               .arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), value, SensorModel::InputRole);
+    return setModelValueById(
+        m_model, id, value, SensorModel::InputRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "value", "sensor");
 }
 
 Q_INVOKABLE bool SensorController::setSensorThreshold(const QUuid &id, double threshold)
 {
-    if (!m_model)
-        return false;
-
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(QString("Attempted to set threshold for non-existent sensor with id: %1")
-                               .arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), threshold, SensorModel::ThresholdRole);
+    return setModelValueById(
+        m_model, id, threshold, SensorModel::ThresholdRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "threshold", "sensor");
 }
 
 Q_INVOKABLE bool SensorController::setTriggered(const QUuid &id, const bool &isTriggered)
 {
-    if (!m_model)
-        return false;
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(QString("Attempted to set triggered for non-existent sensor with id: %1")
-                               .arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), isTriggered, SensorModel::TriggerRole);
+    return setModelValueById(
+        m_model, id, isTriggered, SensorModel::TriggerRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "triggered", "sensor");
 }
 
 Q_INVOKABLE bool SensorController::setSensorName(const QUuid &id, const QString &name)
 {
-    if (!m_model)
-        return false;
-
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(
-            QString("Attempted to set name for non-existent sensor with id: %1").arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), name, SensorModel::NameRole);
+    return setModelValueById(
+        m_model, id, name, SensorModel::NameRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "name", "sensor");
 }
 
 Q_INVOKABLE bool SensorController::setSensorPositionXY(const QUuid &id, double x, double y)
@@ -117,34 +87,16 @@ Q_INVOKABLE bool SensorController::setSensorPositionXY(const QUuid &id, double x
 
 Q_INVOKABLE bool SensorController::setSensorPositionX(const QUuid &id, double x)
 {
-    if (!m_model)
-        return false;
-
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(
-            QString("Attempted to set position X for non-existent sensor with id: %1")
-                .arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), x, SensorModel::XRole);
+    return setModelValueById(
+        m_model, id, x, SensorModel::XRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "position X", "sensor");
 }
 
 Q_INVOKABLE bool SensorController::setSensorPositionY(const QUuid &id, double y)
 {
-    if (!m_model)
-        return false;
-
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(
-            QString("Attempted to set position Y for non-existent sensor with id: %1")
-                .arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), y, SensorModel::YRole);
+    return setModelValueById(
+        m_model, id, y, SensorModel::YRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "position Y", "sensor");
 }
 
 Q_INVOKABLE void SensorController::setActiveLayer(const QString &layerName)

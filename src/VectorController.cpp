@@ -1,4 +1,5 @@
 #include "VectorController.h"
+#include "controllers/ControllerUtils.h"
 
 VectorController::VectorController(QObject *parent)
     : QObject(parent)
@@ -38,62 +39,30 @@ Q_INVOKABLE bool VectorController::removeVector(const QUuid &id)
 
 Q_INVOKABLE bool VectorController::setVectorRotation(const QUuid &id, double rotation)
 {
-    if (!m_model)
-        return false;
-
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(QString("Attempted to set rotation for non-existent vector with id: %1")
-                               .arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), rotation, VectorModel::RotationRole);
+    return setModelValueById(
+        m_model, id, rotation, VectorModel::RotationRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "rotation", "vector");
 }
 
 Q_INVOKABLE bool VectorController::setVectorScale(const QUuid &id, double scale)
 {
-    if (!m_model)
-        return false;
-
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(QString("Attempted to set scale for non-existent vector with id: %1")
-                               .arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), scale, VectorModel::ScaleRole);
+    return setModelValueById(
+        m_model, id, scale, VectorModel::ScaleRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "scale", "vector");
 }
 
 Q_INVOKABLE bool VectorController::setVectorColor(const QUuid &id, const QColor &color)
 {
-    if (!m_model)
-        return false;
-
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(QString("Attempted to set color for non-existent vector with id: %1")
-                               .arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), color, VectorModel::ColorRole);
+    return setModelValueById(
+        m_model, id, color, VectorModel::ColorRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "color", "vector");
 }
 
 Q_INVOKABLE bool VectorController::setVectorName(const QUuid &id, const QString &name)
 {
-    if (!m_model)
-        return false;
-
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(
-            QString("Attempted to set name for non-existent vector with id: %1").arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), name, VectorModel::NameRole);
+    return setModelValueById(
+        m_model, id, name, VectorModel::NameRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "name", "vector");
 }
 
 Q_INVOKABLE bool VectorController::setVectorPositionXY(const QUuid &id, double x, double y)
@@ -116,34 +85,16 @@ Q_INVOKABLE bool VectorController::setVectorPositionXY(const QUuid &id, double x
 
 Q_INVOKABLE bool VectorController::setVectorPositionX(const QUuid &id, double x)
 {
-    if (!m_model)
-        return false;
-
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(
-            QString("Attempted to set position X for non-existent vector with id: %1")
-                .arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), x, VectorModel::XRole);
+    return setModelValueById(
+        m_model, id, x, VectorModel::XRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "position X", "vector");
 }
 
 Q_INVOKABLE bool VectorController::setVectorPositionY(const QUuid &id, double y)
 {
-    if (!m_model)
-        return false;
-
-    int index = m_model->getIndexFromId(id);
-    if (index < 0) {
-        emit errorOccurred(
-            QString("Attempted to set position Y for non-existent vector with id: %1")
-                .arg(id.toString()));
-        return false;
-    }
-
-    return m_model->setData(m_model->index(index), y, VectorModel::YRole);
+    return setModelValueById(
+        m_model, id, y, VectorModel::YRole,
+        [this](const QString &message) { emit errorOccurred(message); }, "position Y", "vector");
 }
 
 Q_INVOKABLE void VectorController::setActiveLayer(const QString &layerName)
