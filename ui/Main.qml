@@ -16,13 +16,15 @@ Window {
     Material.theme: Material.Dark
     Material.accent: "#98FF98"
 
+    AppCoordinator {
+        id: appCoordinator
+    }
+
     SensorController {
         id: sensorController
 
         onSensorAdded: function (id, name, input, threshold, isTriggered, layer, x, y) {
-            if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
-                sensorPanel.addPointToGraph(id, x, y, isTriggered);
-            }
+            appCoordinator.onSensorAdded(sensorPanel, monitor, id, layer, x, y, isTriggered);
         }
 
         onSensorRemoved: function (id) {
@@ -30,9 +32,7 @@ Window {
         }
 
         onSensorUpdated: function (id, name, input, threshold, isTriggered, layer, x, y) {
-            if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
-                sensorPanel.updatePointOnGraph(id, x, y, isTriggered);
-            }
+            appCoordinator.onSensorUpdated(sensorPanel, monitor, id, layer, x, y, isTriggered);
         }
 
         onClearChartSeries: function () {
@@ -48,9 +48,7 @@ Window {
         id: vectorController
 
         onVectorAdded: function (id, name, rotation, scale, color, layer, x, y) {
-            if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
-                sensorPanel.addArrowToGraph(id, rotation, scale, color, x, y);
-            }
+            appCoordinator.onVectorAdded(sensorPanel, monitor, id, rotation, scale, color, layer, x, y);
         }
 
         onVectorRemoved: function (id) {
@@ -58,9 +56,7 @@ Window {
         }
 
         onVectorUpdated: function (id, name, rotation, scale, color, layer, x, y) {
-            if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
-                sensorPanel.updateArrowOnGraph(id, rotation, scale, color, x, y);
-            }
+            appCoordinator.onVectorUpdated(sensorPanel, monitor, id, rotation, scale, color, layer, x, y);
         }
 
         onClearChartSeries: function () {
@@ -140,11 +136,7 @@ Window {
         serialParser: serialParser
 
         onCurrentFrameChanged: {
-            if (!serialParser.isConnected) {
-                sensorPanel.clearGraph();
-                serialParser.restoreToIndex(timelineBar.currentFrame);
-            }
-            timelineBar.updateTimelineProps();
+            appCoordinator.onTimelineFrameChanged(serialParser, sensorPanel, timelineBar);
         }
 
         Connections {
@@ -153,10 +145,7 @@ Window {
                 timelineBar.updateTimelineProps();
             }
             function onConnectionChanged() {
-                if (serialParser.isConnected) {
-                    sensorController.setActiveLayer(monitor.selectedSensorLayer);
-                    vectorController.setActiveLayer(monitor.selectedVectorLayer);
-                }
+                appCoordinator.onSerialConnectionChanged(serialParser, sensorController, vectorController, monitor);
             }
         }
     }
