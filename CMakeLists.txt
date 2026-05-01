@@ -12,12 +12,49 @@ set(APP_SRC_DIR "src")
 set(APP_INCLUDE_DIR "include")
 set(APP_UI_DIR "ui")
 set(APP_QML_DIR "qml")
+set(APP_PARSER_INCLUDE_DIR "${APP_INCLUDE_DIR}/parser")
+set(APP_PARSER_SRC_DIR "${APP_SRC_DIR}/parser")
 
 qt_add_executable(appRoboticus_control_center
     "${APP_SRC_DIR}/main.cpp"
 )
 
 add_subdirectory(libs/qmsgpack)
+
+add_library(domain_models STATIC
+    "${APP_INCLUDE_DIR}/SensorModel.h"
+    "${APP_SRC_DIR}/SensorModel.cpp"
+    "${APP_INCLUDE_DIR}/VectorModel.h"
+    "${APP_SRC_DIR}/VectorModel.cpp"
+)
+target_include_directories(domain_models PUBLIC "${APP_INCLUDE_DIR}")
+target_link_libraries(domain_models PUBLIC Qt6::Core Qt6::Qml Qt6::Gui)
+
+add_library(app_controllers STATIC
+    "${APP_INCLUDE_DIR}/SensorController.h"
+    "${APP_SRC_DIR}/SensorController.cpp"
+    "${APP_INCLUDE_DIR}/VectorController.h"
+    "${APP_SRC_DIR}/VectorController.cpp"
+    "${APP_INCLUDE_DIR}/controllers/ControllerUtils.h"
+)
+target_include_directories(app_controllers PUBLIC "${APP_INCLUDE_DIR}")
+target_link_libraries(app_controllers PUBLIC domain_models Qt6::Core Qt6::Qml Qt6::Gui)
+
+add_library(io_serial STATIC
+    "${APP_INCLUDE_DIR}/SerialParser.h"
+    "${APP_SRC_DIR}/SerialParser.cpp"
+    "${APP_PARSER_INCLUDE_DIR}/FrameTypes.h"
+    "${APP_PARSER_INCLUDE_DIR}/SerialFrameExtractor.h"
+    "${APP_PARSER_INCLUDE_DIR}/FrameDecoder.h"
+    "${APP_PARSER_INCLUDE_DIR}/SnapshotStore.h"
+    "${APP_PARSER_INCLUDE_DIR}/SnapshotLoader.h"
+    "${APP_PARSER_SRC_DIR}/SerialFrameExtractor.cpp"
+    "${APP_PARSER_SRC_DIR}/FrameDecoder.cpp"
+    "${APP_PARSER_SRC_DIR}/SnapshotStore.cpp"
+    "${APP_PARSER_SRC_DIR}/SnapshotLoader.cpp"
+)
+target_include_directories(io_serial PUBLIC "${APP_INCLUDE_DIR}")
+target_link_libraries(io_serial PUBLIC domain_models Qt6::Core Qt6::Qml Qt6::SerialPort qmsgpack)
 
 qt_add_qml_module(appRoboticus_control_center
     URI com.Roboticus.ControlCenter
@@ -33,6 +70,7 @@ qt_add_qml_module(appRoboticus_control_center
         "${APP_QML_DIR}/Error.qml"
         "${APP_QML_DIR}/TitleBar.qml"
         "${APP_QML_DIR}/Timeline.qml"
+        "${APP_QML_DIR}/AppCoordinator.qml"
 
     RESOURCES
         "${APP_QML_DIR}/assets/SVG/add.svg"
@@ -48,15 +86,10 @@ qt_add_qml_module(appRoboticus_control_center
 
     SOURCES
         "${APP_INCLUDE_DIR}/SensorController.h"
-        "${APP_SRC_DIR}/SensorController.cpp"
-        "${APP_SRC_DIR}/SensorModel.cpp"
         "${APP_INCLUDE_DIR}/SensorModel.h"
         "${APP_INCLUDE_DIR}/VectorController.h"
-        "${APP_SRC_DIR}/VectorController.cpp"
         "${APP_INCLUDE_DIR}/VectorModel.h"
-        "${APP_SRC_DIR}/VectorModel.cpp"
         "${APP_INCLUDE_DIR}/SerialParser.h"
-        "${APP_SRC_DIR}/SerialParser.cpp"
 
 )
 
@@ -77,7 +110,8 @@ target_include_directories(appRoboticus_control_center PRIVATE
 )
 
 target_link_libraries(appRoboticus_control_center
-    PRIVATE Qt6::Quick Qt6::Graphs Qt6::SerialPort Qt6::Gui qmsgpack
+    PRIVATE Qt6::Quick Qt6::Graphs Qt6::SerialPort Qt6::Gui
+            app_controllers io_serial
 )
 
 include(GNUInstallDirs)

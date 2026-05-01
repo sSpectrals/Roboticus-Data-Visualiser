@@ -1,11 +1,6 @@
 #ifndef SERIALPARSER_H
 #define SERIALPARSER_H
 
-#include <QDebug>
-#include <QFile>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QObject>
 #include <QQmlEngine>
 #include <QSerialPort>
@@ -15,12 +10,10 @@
 
 #include "SensorModel.h"
 #include "VectorModel.h"
-
-struct FrameSnapshot {
-  qint64 timestamp;
-  QList<Sensor> sensors;
-  QList<Vector> vectors;
-};
+#include "parser/FrameDecoder.h"
+#include "parser/SerialFrameExtractor.h"
+#include "parser/SnapshotLoader.h"
+#include "parser/SnapshotStore.h"
 
 class SerialParser : public QObject {
   Q_OBJECT
@@ -54,7 +47,7 @@ public:
                              VectorModel *vectorModel);
   Q_INVOKABLE void readData();
 
-  Q_INVOKABLE int snapshotCount() const { return m_snapshots.size(); }
+  Q_INVOKABLE int snapshotCount() const { return m_snapshotStore.count(); }
   Q_INVOKABLE qint64 timestampAt(int index) const;
 
   Q_INVOKABLE bool saveToFile(QUrl filePath);
@@ -72,20 +65,19 @@ private:
   QStringList m_availablePorts;
   QTimer m_portRefreshTimer;
 
-  QList<FrameSnapshot> m_snapshots;
   QSerialPort m_serial;
-  QByteArray m_buffer;
   SensorModel *m_sensorModel = nullptr;
   VectorModel *m_vectorModel = nullptr;
+  SerialFrameExtractor m_frameExtractor;
+  FrameDecoder m_frameDecoder;
+  SnapshotStore m_snapshotStore;
+  SnapshotLoader m_snapshotLoader;
 
   void configureDefaultSettings();
   void handleSerialError(QSerialPort::SerialPortError error);
-  void processJsonData(const QByteArray &jsonData);
   void processMsgPackData(const QByteArray &jsonData);
-  void updateSensorsFromVariant(const QVariantList &sensors);
-  void updateVectorsFromVariant(const QVariantList &vectors);
-  void updateSensorsFromJson(const QJsonArray &sensors);
-  void updateVectorsFromJson(const QJsonArray &vectors);
+  void updateSensorsFromMsgPack(const QVariantList &sensors);
+  void updateVectorsFromMsgPack(const QVariantList &vectors);
   double roundTo2Decimals(float val);
   QStringList availablePorts();
 };
