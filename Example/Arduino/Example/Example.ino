@@ -1,5 +1,6 @@
 #include "RoboticusDebugger.h"
 
+
 RoboticusDebugger debugger(Serial);
 
 // Create arrays of sensors  ||  name | input | operatorStr | threshold | x | y
@@ -15,40 +16,7 @@ Sensor sensors[] = {
     {"IR_8", 31.7, ">", 28.0, "Circle Layer", -5.88, 8.09},
     {"IR_9", 22.1, "<", 25.0, "Circle Layer", -8.09, 5.88},
     {"IR_10", true, "==", true, "Circle Layer", -9.51, 3.09},
-    {"IR_11", 23.5, ">=", 30.0, "Circle Layer", -10.0, 0.0},
-    {"IR_12", 18.2, "<=", 20.0, "Circle Layer", -9.51, -3.09},
-    {"IR_13", 31.7, ">", 28.0, "Circle Layer", -8.09, -5.88},
-    {"IR_14", 22.1, "<", 25.0, "Circle Layer", -5.88, -8.09},
-    {"IR_15", true, "==", true, "Circle Layer", -3.09, -9.51},
-    {"IR_16", 23.5, ">=", 30.0, "Circle Layer", 0.0, -10.0},
-    {"IR_17", 18.2, "<=", 20.0, "Circle Layer", 3.09, -9.51},
-    {"IR_18", 31.7, ">", 28.0, "Circle Layer", 5.88, -8.09},
-    {"IR_19", 22.1, "<", 25.0, "Circle Layer", 8.09, -5.88},
-    {"IR_20", true, "==", true, "Circle Layer", 9.51, -3.09},
-
-    // Right arm (+X direction) - 4 points
-    {"IR_21", 23.5, ">=", 30.0, "Right arm", 13.0, 0.0},
-    {"IR_22", 18.2, "<=", 20.0, "Right arm", 16.0, 0.0},
-    {"IR_23", 31.7, ">", 28.0, "Right arm", 18.5, 0.0},
-    {"IR_24", 22.1, "<", 25.0, "Right arm", 20.0, 0.0},
-
-    // Left arm (-X direction) - 4 points
-    {"IR_25", true, "==", true, "Left arm", -13.0, 0.0},
-    {"IR_26", 23.5, ">=", 30.0, "Left arm", -16.0, 0.0},
-    {"IR_27", 18.2, "<=", 20.0, "Left arm", -18.5, 0.0},
-    {"IR_28", 31.7, ">", 28.0, "Left arm", -20.0, 0.0},
-
-    // Top arm (+Y direction) - 4 points
-    {"IR_29", 22.1, "<", 25.0, "Top arm", 0.0, 13.0},
-    {"IR_30", true, "==", true, "Top arm", 0.0, 16.0},
-    {"IR_31", 23.5, ">=", 30.0, "Top arm", 0.0, 18.5},
-    {"IR_32", 18.2, "<=", 20.0, "Top arm", 0.0, 20.0},
-
-    // Bottom arm (-Y direction) - 4 points
-    {"IR_33", 31.7, ">", 28.0, "Bottom arm", 0.0, -13.0},
-    {"IR_34", 22.1, "<", 25.0, "Bottom arm", 0.0, -16.0},
-    {"IR_35", true, "==", true, "Bottom arm", 0.0, -18.5},
-    {"IR_36", 23.5, ">=", 30.0, "Bottom arm", 0.0, -20.0}};
+};
 
 // Create arrays of vectors
 Vector vectors[] = {
