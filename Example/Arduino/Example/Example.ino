@@ -1,6 +1,5 @@
 #include "RoboticusDebugger.h"
 
-
 RoboticusDebugger debugger(Serial);
 
 // Create arrays of sensors  ||  name | input | operatorStr | threshold | x | y
@@ -16,7 +15,40 @@ Sensor sensors[] = {
     {"IR_8", 31.7, ">", 28.0, "Circle Layer", -5.88, 8.09},
     {"IR_9", 22.1, "<", 25.0, "Circle Layer", -8.09, 5.88},
     {"IR_10", true, "==", true, "Circle Layer", -9.51, 3.09},
-};
+    {"IR_11", 23.5, ">=", 30.0, "Circle Layer", -10.0, 0.0},
+    {"IR_12", 18.2, "<=", 20.0, "Circle Layer", -9.51, -3.09},
+    {"IR_13", 31.7, ">", 28.0, "Circle Layer", -8.09, -5.88},
+    {"IR_14", 22.1, "<", 25.0, "Circle Layer", -5.88, -8.09},
+    {"IR_15", true, "==", true, "Circle Layer", -3.09, -9.51},
+    {"IR_16", 23.5, ">=", 30.0, "Circle Layer", 0.0, -10.0},
+    {"IR_17", 18.2, "<=", 20.0, "Circle Layer", 3.09, -9.51},
+    {"IR_18", 31.7, ">", 28.0, "Circle Layer", 5.88, -8.09},
+    {"IR_19", 22.1, "<", 25.0, "Circle Layer", 8.09, -5.88},
+    {"IR_20", true, "==", true, "Circle Layer", 9.51, -3.09},
+
+    // Right arm (+X direction) - 4 points
+    {"IR_21", 23.5, ">=", 30.0, "Right arm", 13.0, 0.0},
+    {"IR_22", 18.2, "<=", 20.0, "Right arm", 16.0, 0.0},
+    {"IR_23", 31.7, ">", 28.0, "Right arm", 18.5, 0.0},
+    {"IR_24", 22.1, "<", 25.0, "Right arm", 20.0, 0.0},
+
+    // Left arm (-X direction) - 4 points
+    {"IR_25", true, "==", true, "Left arm", -13.0, 0.0},
+    {"IR_26", 23.5, ">=", 30.0, "Left arm", -16.0, 0.0},
+    {"IR_27", 18.2, "<=", 20.0, "Left arm", -18.5, 0.0},
+    {"IR_28", 31.7, ">", 28.0, "Left arm", -20.0, 0.0},
+
+    // Top arm (+Y direction) - 4 points
+    {"IR_29", 22.1, "<", 25.0, "Top arm", 0.0, 13.0},
+    {"IR_30", true, "==", true, "Top arm", 0.0, 16.0},
+    {"IR_31", 23.5, ">=", 30.0, "Top arm", 0.0, 18.5},
+    {"IR_32", 18.2, "<=", 20.0, "Top arm", 0.0, 20.0},
+
+    // Bottom arm (-Y direction) - 4 points
+    {"IR_33", 31.7, ">", 28.0, "Bottom arm", 0.0, -13.0},
+    {"IR_34", 22.1, "<", 25.0, "Bottom arm", 0.0, -16.0},
+    {"IR_35", true, "==", true, "Bottom arm", 0.0, -18.5},
+    {"IR_36", 23.5, ">=", 30.0, "Bottom arm", 0.0, -20.0}};
 
 // Create arrays of vectors
 Vector vectors[] = {
@@ -31,18 +63,10 @@ const int numVectors = sizeof(vectors) / sizeof(vectors[0]);
 
 void setup() { Serial.begin(115200); }
 
+// Note: The debugger might be heavy on the ram and won't be able to send a
+// large amount at once. Splitting up the work and writing twice helps for i.e.
+// Arduino mega/due. Sending all 36 once works on teensy or xiao-rp2040
 void loop() {
-
-  for (int i = 0; i < numSensors; i++) {
-    // Add every sensor object to the debugger
-    debugger.add(sensors[i]);
-  }
-
-  for (int i = 0; i < numVectors; i++) {
-    // Add every vector object to the debugger
-    debugger.add(vectors[i]);
-  }
-
   // emulating changes in sensor inputs and vector rotations for demonstration
   // purposes
   for (int i = 0; i < numSensors; i++) {
@@ -51,6 +75,22 @@ void loop() {
   vectors[0].rotation += 1.0;
   vectors[1].rotation += 3.0;
   vectors[2].rotation += 9.0;
+
+  for (int i = 0; i < 20; i++) {
+    // Add a subset of sensor objects to the debugger (20 out of 36)
+    debugger.add(sensors[i]);
+  }
+  for (int i = 0; i < numVectors; i++) {
+    // Add every vector object to the debugger
+    debugger.add(vectors[i]);
+  }
+
+  debugger.write(); // Send the frame to the app and clear for next frame
+
+  for (int i = 20; i < numSensors; i++) {
+    // Add the remaining sensor objects to the debugger (16 out of 36)
+    debugger.add(sensors[i]);
+  }
 
   debugger.write(); // Send the frame to the app and clear for next frame
 }
