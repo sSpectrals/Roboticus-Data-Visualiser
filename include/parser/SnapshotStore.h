@@ -1,7 +1,7 @@
 #ifndef SNAPSHOTSTORE_H
 #define SNAPSHOTSTORE_H
 
-#include "parser/FrameTypes.h"
+#include "FrameTypes.h"
 
 class SnapshotStore : public QObject {
 public:

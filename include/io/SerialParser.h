@@ -1,14 +1,13 @@
 #ifndef SERIALPARSER_H
 #define SERIALPARSER_H
 
-
-#include "parser/SerialFrameExtractor.h"
-#include "parser/FrameTypes.h"
+#include "../parser/FrameTypes.h"
+#include "../parser/SerialFrameExtractor.h"
 
 #include <QByteArray>
 
 class SerialParser : public QObject {
- Q_OBJECT
+  Q_OBJECT
 public:
   explicit SerialParser(QObject *parent = nullptr);
 

@@ -85,7 +85,7 @@ Rectangle {
             }
 
             Image {
-                source: backButton.enabled ? "./assets/SVG/arrow_left_green.svg" : "./assets/SVG/arrow_left_grey.svg"
+                source: backButton.enabled ? "../../assets/SVG/arrow_left_green.svg" : "../../assets/SVG/arrow_left_grey.svg"
                 anchors.centerIn: parent
                 width: parent.width * 0.6
                 height: parent.height * 0.6
@@ -149,7 +149,7 @@ Rectangle {
             }
 
             Image {
-                source: forwardButton.enabled ? "./assets/SVG/arrow_right_green.svg" : "./assets/SVG/arrow_right_grey.svg"
+                source: forwardButton.enabled ? "../../assets/SVG/arrow_right_green.svg" : "../../assets/SVG/arrow_right_grey.svg"
                 anchors.centerIn: parent
                 width: parent.width * 0.6
                 height: parent.height * 0.6
@@ -353,7 +353,7 @@ Rectangle {
             }
 
             Image {
-                source: "./assets/SVG/download.svg"
+                source: "../../assets/SVG/download.svg"
                 anchors.centerIn: parent
                 width: parent.width * 0.5
                 height: parent.height * 0.5
@@ -428,7 +428,7 @@ Rectangle {
             }
 
             Image {
-                source: "./assets/SVG/upload.svg"
+                source: "../../assets/SVG/upload.svg"
                 anchors.centerIn: parent
                 width: parent.width * 0.5
                 height: parent.height * 0.5

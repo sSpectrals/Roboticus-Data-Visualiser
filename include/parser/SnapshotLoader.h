@@ -1,11 +1,11 @@
 #ifndef SNAPSHOTLOADER_H
 #define SNAPSHOTLOADER_H
 
-#include "parser/FrameTypes.h"
+#include "FrameTypes.h"
 
 #include <QUrl>
 
-class SnapshotLoader : public QObject{
+class SnapshotLoader : public QObject {
 public:
   explicit SnapshotLoader(QObject *parent = nullptr);
 

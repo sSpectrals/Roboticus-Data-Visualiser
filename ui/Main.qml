@@ -1,5 +1,5 @@
 import QtQuick
-import "../qml"
+import "./components"
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material
 import com.Roboticus.ControlCenter

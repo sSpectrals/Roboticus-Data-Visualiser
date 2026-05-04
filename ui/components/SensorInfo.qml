@@ -150,7 +150,7 @@ Rectangle {
             radius: 10
 
             Image {
-                source: "./assets/SVG/trash.svg"
+                source: "../../assets/SVG/trash.svg"
                 anchors.centerIn: parent
             }
 

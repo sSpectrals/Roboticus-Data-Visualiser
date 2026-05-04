@@ -5,13 +5,13 @@
 #include <QQmlEngine>
 #include <QUrl>
 
-#include "../include/SensorModel.h"
-#include "../include/SerialParser.h"
-#include "../include/SerialPortManager.h"
-#include "../include/VectorModel.h"
-#include "../include/parser/SnapshotLoader.h"
-#include "../include/parser/SnapshotStore.h"
-#include "parser/FrameTypes.h"
+#include "include/io/SerialParser.h"
+#include "include/io/SerialPortManager.h"
+#include "include/models/SensorModel.h"
+#include "include/models/VectorModel.h"
+#include "include/parser/FrameTypes.h"
+#include "include/parser/SnapshotLoader.h"
+#include "include/parser/SnapshotStore.h"
 
 class AppController : public QObject {
   Q_OBJECT
