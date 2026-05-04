@@ -126,7 +126,7 @@ void SerialPortManager::readData() {
     return;
   }
 
-  emit parseRawData(m_serial.readAll());
+  emit rawDataReceived(m_serial.readAll());
 }
 
 void SerialPortManager::refreshPorts() {

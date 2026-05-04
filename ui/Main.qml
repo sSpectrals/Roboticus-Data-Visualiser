@@ -68,8 +68,18 @@ Window {
         }
     }
 
+
+
+    SerialPortManager {
+        id: serialPortManager
+        onErrorOccurred: function (message) {
+            errorPopup.show(message);
+        }
+    }
+
     SerialParser {
         id: serialParser
+        portManager: serialPortManager
         Component.onCompleted: setModels(sensorController.model, vectorController.model)
 
         onErrorOccurred: function (message) {
@@ -101,7 +111,7 @@ Window {
     TitleBar {
         id: title
 
-        serialParser: serialParser
+        portManager: serialPortManager
     }
 
     MonitoringPanel {
@@ -136,16 +146,23 @@ Window {
         serialParser: serialParser
 
         onCurrentFrameChanged: {
-            appCoordinator.onTimelineFrameChanged(serialParser, sensorPanel, timelineBar);
+            appCoordinator.onTimelineFrameChanged(serialPortManager, serialParser, sensorPanel, timelineBar);
         }
 
         Connections {
             target: serialParser
+
             function onSnapshotsChanged() {
                 timelineBar.updateTimelineProps();
             }
+        }
+
+
+        Connections {
+            target: serialPortManager
+
             function onConnectionChanged() {
-                appCoordinator.onSerialConnectionChanged(serialParser, sensorController, vectorController, monitor);
+                appCoordinator.onSerialConnectionChanged(serialPortManager, sensorController, vectorController, monitor);
             }
         }
     }

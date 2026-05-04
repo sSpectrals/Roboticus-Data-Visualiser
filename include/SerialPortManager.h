@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDebug>
 #include <QObject>
 #include <QQmlEngine>
 #include <QSerialPort>
@@ -32,7 +33,7 @@ signals:
   void connectionChanged();
   void portChanged();
   void availablePortsChanged();
-  void parseRawData(const QByteArray &data);
+  void rawDataReceived(const QByteArray &data);
   void errorOccurred(const QString &message);
 
 private slots:

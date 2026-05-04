@@ -3,12 +3,10 @@
 
 #include <QObject>
 #include <QQmlEngine>
-#include <QSerialPort>
-#include <QSerialPortInfo>
-#include <QTimer>
 #include <QUrl>
 
 #include "SensorModel.h"
+#include "SerialPortManager.h"
 #include "VectorModel.h"
 #include "parser/FrameDecoder.h"
 #include "parser/SerialFrameExtractor.h"
@@ -19,53 +17,38 @@ class SerialParser : public QObject {
   Q_OBJECT
   QML_ELEMENT
 
-  Q_PROPERTY(bool isConnected READ isConnected NOTIFY connectionChanged)
-  Q_PROPERTY(QString currentPort READ currentPort NOTIFY portChanged)
-  Q_PROPERTY(QStringList availablePortsList READ availablePortsList NOTIFY
-                 availablePortsChanged)
+  Q_PROPERTY(SerialPortManager *portManager READ portManager WRITE
+                 setPortManager NOTIFY portManagerChanged)
 
 public:
   explicit SerialParser(QObject *parent = nullptr);
 
-  Q_INVOKABLE bool connectToPort();
-
-  Q_INVOKABLE bool setBaudRate(int baudRate);
-  Q_INVOKABLE bool setComPort(QString port);
-  Q_INVOKABLE void disconnectPort();
-
-  QStringList availablePortsList() const { return m_availablePorts; }
-  Q_INVOKABLE void refreshPorts();
-
-  bool isConnected() const { return m_serial.isOpen(); }
-  QString currentPort() const { return m_serial.portName(); }
-
-  Q_INVOKABLE QList<qint64> availableTimestamps() const;
-  Q_INVOKABLE bool restoreToIndex(int index);
-
   Q_INVOKABLE void setModels(QList<Sensor> sensors, QList<Vector> vectors);
   Q_INVOKABLE void setModels(SensorModel *sensorModel,
                              VectorModel *vectorModel);
-  Q_INVOKABLE void readData();
-
-  Q_INVOKABLE int snapshotCount() const { return m_snapshotStore.count(); }
-  Q_INVOKABLE qint64 timestampAt(int index) const;
 
   Q_INVOKABLE bool saveToFile(QUrl filePath);
   Q_INVOKABLE bool loadFromFile(QUrl filePath);
 
+  Q_INVOKABLE qint64 timestampAt(int index) const;
+  Q_INVOKABLE QList<qint64> availableTimestamps() const;
+  Q_INVOKABLE bool restoreToIndex(int index);
+  Q_INVOKABLE int snapshotCount() const { return m_snapshotStore.count(); }
+
+  SerialPortManager *portManager() const { return m_portManager; }
+  void setPortManager(SerialPortManager *pm);
+
 signals:
-  void connectionChanged();
-  void portChanged();
-  void dataReceived(QByteArray data);
-  void availablePortsChanged();
+  void portManagerChanged();
+  void dataReceived(const QByteArray &data);
   void snapshotsChanged();
-  void errorOccurred(QString message);
+  void errorOccurred(const QString &message);
+
+private slots:
+  void onRawDataReady(const QByteArray &data);
 
 private:
-  QStringList m_availablePorts;
-  QTimer m_portRefreshTimer;
-
-  QSerialPort m_serial;
+  SerialPortManager *m_portManager = nullptr;
   SensorModel *m_sensorModel = nullptr;
   VectorModel *m_vectorModel = nullptr;
   SerialFrameExtractor m_frameExtractor;
@@ -73,13 +56,10 @@ private:
   SnapshotStore m_snapshotStore;
   SnapshotLoader m_snapshotLoader;
 
-  void configureDefaultSettings();
-  void handleSerialError(QSerialPort::SerialPortError error);
   void processMsgPackData(const QByteArray &jsonData);
   void updateSensorsFromMsgPack(const QVariantList &sensors);
   void updateVectorsFromMsgPack(const QVariantList &vectors);
-  double roundTo2Decimals(float val);
-  QStringList availablePorts();
+  static double roundTo2Decimals(float val);
 };
 
 #endif // SERIALPARSER_H

@@ -43,6 +43,8 @@ target_link_libraries(app_controllers PUBLIC domain_models Qt6::Core Qt6::Qml Qt
 add_library(io_serial STATIC
     "${APP_INCLUDE_DIR}/SerialParser.h"
     "${APP_SRC_DIR}/SerialParser.cpp"
+    "${APP_INCLUDE_DIR}/SerialPortManager.h"
+    "${APP_SRC_DIR}/SerialPortManager.cpp"
     "${APP_PARSER_INCLUDE_DIR}/FrameTypes.h"
     "${APP_PARSER_INCLUDE_DIR}/SerialFrameExtractor.h"
     "${APP_PARSER_INCLUDE_DIR}/FrameDecoder.h"
@@ -90,6 +92,7 @@ qt_add_qml_module(appRoboticus_control_center
         "${APP_INCLUDE_DIR}/VectorController.h"
         "${APP_INCLUDE_DIR}/VectorModel.h"
         "${APP_INCLUDE_DIR}/SerialParser.h"
+        "${APP_INCLUDE_DIR}/SerialPortManager.h"
 
 )
 

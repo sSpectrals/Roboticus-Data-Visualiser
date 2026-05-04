@@ -3,158 +3,7 @@
 #include <QVariant>
 #include <QVariantMap>
 
-SerialParser::SerialParser(QObject *parent) : QObject(parent) {
-  refreshPorts();
-
-  // Setup timer to poll for port changes every 1 second
-  connect(&m_portRefreshTimer, &QTimer::timeout, this,
-          &SerialParser::refreshPorts);
-  m_portRefreshTimer.start(1000);
-
-  connect(&m_serial, &QSerialPort::errorOccurred, this,
-          &SerialParser::handleSerialError);
-}
-
-Q_INVOKABLE bool SerialParser::connectToPort() {
-  if (m_serial.isOpen()) {
-    m_serial.close();
-  }
-
-  if (m_serial.portName().isEmpty()) {
-    qDebug() << "No COM port selected";
-    emit errorOccurred(
-        "No COM port selected. Please choose a port to connect.");
-    return false;
-  }
-
-  if (m_serial.baudRate() <= 0) {
-    qDebug() << "Failed to set baudrate";
-    emit errorOccurred("Failed to set baud rate. Please check your settings.");
-    return false;
-  }
-
-  configureDefaultSettings();
-
-  bool success = m_serial.open(QIODevice::ReadOnly);
-
-  if (success) {
-
-    m_serial.setDataTerminalReady(true);
-
-    // Clear any startup garbage (null bytes from Arduino reset)
-    m_frameExtractor = SerialFrameExtractor();
-    m_serial.clear();
-
-    connect(&m_serial, &QSerialPort::readyRead, this, &SerialParser::readData,
-            Qt::UniqueConnection);
-
-    qDebug() << "successfully connected";
-    qDebug() << "Port:" << m_serial.portName()
-             << "Baud:" << m_serial.baudRate();
-    emit connectionChanged();
-    emit portChanged();
-  } else {
-    qDebug() << "Error:" << m_serial.error() << m_serial.errorString()
-             << "\nCheck if you have a serial monitor open somewhere else";
-    qDebug() << "Port:" << m_serial.portName()
-             << "Baud:" << m_serial.baudRate();
-    emit errorOccurred("Failed to connect to port. Please check if the port is "
-                       "correct and not in use by another application.");
-  }
-
-  return success;
-}
-
-void SerialParser::configureDefaultSettings() {
-  m_serial.setParity(QSerialPort::NoParity);
-  m_serial.setDataBits(QSerialPort::Data8);
-  m_serial.setStopBits(QSerialPort::OneStop);
-  m_serial.setFlowControl(QSerialPort::NoFlowControl);
-}
-
-bool SerialParser::setBaudRate(int baudRate) {
-  bool wasOpen = m_serial.isOpen();
-
-  if (wasOpen) {
-    QString currentPort = m_serial.portName();
-    m_serial.close();
-
-    m_serial.setBaudRate(baudRate);
-    bool success = connectToPort();
-
-    if (success) {
-      emit connectionChanged();
-    }
-
-    return success;
-  } else {
-    return m_serial.setBaudRate(baudRate);
-  }
-}
-
-bool SerialParser::setComPort(QString port) {
-  bool wasOpen = m_serial.isOpen();
-
-  if (wasOpen) {
-    m_serial.close();
-
-    m_serial.setPortName(port);
-
-    bool success = connectToPort();
-    if (success) {
-      emit connectionChanged();
-      emit portChanged();
-    }
-
-    return success;
-  } else {
-    m_serial.setPortName(port);
-    return true;
-  }
-}
-
-void SerialParser::disconnectPort() {
-  if (m_serial.isOpen()) {
-    m_serial.close();
-    emit connectionChanged();
-    qDebug() << "Disconnected from" << m_serial.portName();
-  }
-}
-
-void SerialParser::handleSerialError(QSerialPort::SerialPortError error) {
-  if (error == QSerialPort::NoError) {
-    return;
-  }
-
-  if (!m_serial.isOpen()) {
-    return;
-  }
-
-  if (error == QSerialPort::ResourceError ||
-      error == QSerialPort::DeviceNotFoundError) {
-    qDebug() << "Serial connection lost:" << m_serial.errorString();
-    m_serial.close();
-    emit connectionChanged();
-    emit errorOccurred("Serial connection lost.");
-  }
-}
-
-QStringList SerialParser::availablePorts() {
-  QStringList ports;
-  const auto serialPorts = QSerialPortInfo::availablePorts();
-  for (const QSerialPortInfo &info : serialPorts) {
-    ports.append(info.portName());
-  }
-  return ports;
-}
-
-void SerialParser::refreshPorts() {
-  QStringList newPorts = availablePorts();
-  if (newPorts != m_availablePorts) {
-    m_availablePorts = newPorts;
-    emit availablePortsChanged();
-  }
-}
+SerialParser::SerialParser(QObject *parent) : QObject(parent) {}
 
 void SerialParser::setModels(QList<Sensor> sensors, QList<Vector> vectors) {
   for (const Sensor &s : sensors) {
@@ -174,15 +23,25 @@ void SerialParser::setModels(SensorModel *sensorModel,
   m_vectorModel = vectorModel;
 }
 
-void SerialParser::readData() {
-  if (!m_serial.isOpen()) {
-    qDebug() << "Could not read serial data";
-    emit errorOccurred(
-        "Could not read serial data. Please check your connection.");
+void SerialParser::setPortManager(SerialPortManager *pm) {
+  if (m_portManager == pm)
     return;
+
+  // Disconnect previous port manager if present
+  if (m_portManager) {
+    disconnect(m_portManager, &SerialPortManager::rawDataReceived, this,
+               &SerialParser::onRawDataReady);
   }
 
-  m_frameExtractor.appendData(m_serial.readAll());
+  m_portManager = pm;
+  connect(m_portManager, &SerialPortManager::rawDataReceived, this,
+          &SerialParser::onRawDataReady, Qt::UniqueConnection);
+
+  emit portManagerChanged();
+}
+
+void SerialParser::onRawDataReady(const QByteArray &data) {
+  m_frameExtractor.appendData(data);
   const QList<QByteArray> frames = m_frameExtractor.takeCompleteFrames();
   for (const QByteArray &msgpackData : frames) {
     emit dataReceived(msgpackData);
@@ -221,7 +80,7 @@ void SerialParser::updateSensorsFromMsgPack(const QVariantList &sensors) {
   for (const QVariant &sensorVar : sensors) {
     // [0]=name [1]=input [2]=isTriggered [3]=threshold [4]=layer [5]=x [6]=y
     QVariantList s = sensorVar.toList();
-    if (s.size() < 7) {
+    if (s.size() < 7) { // 7 elements expected for a valid sensor entry
       qDebug() << "Malformed sensor entry, skipping";
       continue;
     }
@@ -257,7 +116,7 @@ void SerialParser::updateVectorsFromMsgPack(const QVariantList &vectors) {
   for (const QVariant &vectorVar : vectors) {
     // [0]=name [1]=rotation [2]=color [3]=layer [4]=x [5]=y
     QVariantList v = vectorVar.toList();
-    if (v.size() < 6) {
+    if (v.size() < 6) { // 6 elements expected for a valid vector entry
       qDebug() << "Malformed vector entry, skipping";
       continue;
     }
@@ -339,7 +198,9 @@ bool SerialParser::restoreToIndex(int index) {
     m_sensorModel->clear();
   if (m_vectorModel)
     m_vectorModel->clear();
-  disconnectPort();
+
+  if (m_portManager)
+    m_portManager->disconnectPort();
   setModels(snapshot.sensors, snapshot.vectors);
   return true;
 }

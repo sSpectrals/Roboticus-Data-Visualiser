@@ -10,7 +10,7 @@ Rectangle {
     height: 50
     color: "transparent"
 
-    required property var serialParser
+    required property var portManager
 
     anchors {
         left: parent.left
@@ -35,7 +35,7 @@ Rectangle {
             Layout.preferredWidth: 150
             Layout.preferredHeight: title.height * 0.6
             Layout.alignment: Qt.AlignVCenter
-            model: serialParser.availablePortsList.length > 0 ? serialParser.availablePortsList : ["No COM Port found"]
+            model: portManager.availablePortsList.length > 0 ? portManager.availablePortsList : ["No COM Port found"]
             Layout.fillWidth: true
 
             Material.accent: "#98FF98"
@@ -44,21 +44,21 @@ Rectangle {
             currentIndex: 0
 
             Connections {
-                target: serialParser
+                target: portManager
                 function onAvailablePortsChanged() {
-                    if (serialParser.availablePortsList.length > 0) {
+                    if (portManager.availablePortsList.length > 0) {
                         comSelection.currentIndex = 0;
-                        serialParser.setComPort(serialParser.availablePortsList[0]);
+                        portManager.setComPort(portManager.availablePortsList[0]);
                     }
                 }
             }
 
             Component.onCompleted: {
                 // Initialize baud rate on startup
-                serialParser.setBaudRate(baudSelection.model[baudSelection.currentIndex]);
+                portManager.setBaudRate(baudSelection.model[baudSelection.currentIndex]);
                 // Initialize COM port if available
-                if (serialParser.availablePortsList.length > 0) {
-                    serialParser.setComPort(serialParser.availablePortsList[0]);
+                if (portManager.availablePortsList.length > 0) {
+                    portManager.setComPort(portManager.availablePortsList[0]);
                 }
             }
 
@@ -120,7 +120,7 @@ Rectangle {
             }
 
             onActivated: function (index) {
-                serialParser.setComPort(model[index]);
+                portManager.setComPort(model[index]);
                 focus = false;
             }
         }
@@ -195,7 +195,7 @@ Rectangle {
             }
 
             onActivated: function (index) {
-                serialParser.setBaudRate(model[index]);
+                portManager.setBaudRate(model[index]);
                 focus = false;
             }
         }
@@ -213,7 +213,7 @@ Rectangle {
             Material.elevation: startMonitor.hovered ? 3 : 1
 
             Text {
-                text: serialParser.isConnected ? "Stop Monitor" : "Start Monitor"
+                text: portManager.isConnected ? "Stop Monitor" : "Start Monitor"
                 anchors.centerIn: parent
                 color: "#98FF98"
                 font.bold: true
@@ -244,10 +244,10 @@ Rectangle {
             }
 
             onClicked: {
-                if (serialParser.isConnected) {
-                    serialParser.disconnectPort();
+                if (portManager.isConnected) {
+                    portManager.disconnectPort();
                 } else {
-                    serialParser.connectToPort();
+                    portManager.connectToPort();
                 }
             }
             HoverHandler {
