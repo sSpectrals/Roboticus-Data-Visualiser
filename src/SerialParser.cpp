@@ -28,7 +28,7 @@ Q_INVOKABLE bool SerialParser::connectToPort() {
   }
 
   if (m_serial.baudRate() <= 0) {
-    qDebug() << "failed to set port or baudrate";
+    qDebug() << "Failed to set baudrate";
     emit errorOccurred("Failed to set baud rate. Please check your settings.");
     return false;
   }
@@ -135,7 +135,7 @@ void SerialParser::handleSerialError(QSerialPort::SerialPortError error) {
     qDebug() << "Serial connection lost:" << m_serial.errorString();
     m_serial.close();
     emit connectionChanged();
-    emit errorOccurred("Serial connection lost. Please reconnect the device.");
+    emit errorOccurred("Serial connection lost.");
   }
 }
 
