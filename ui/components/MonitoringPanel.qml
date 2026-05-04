@@ -211,10 +211,6 @@ Flickable {
                     column.selection = column.selection === sensorDelegate ? null : sensorDelegate
                 }
 
-                onDeleteSensor: {
-                    column.selection = null
-                    sensorController.removeSensor(model.id)
-                }
             }
         }
 
@@ -358,10 +354,6 @@ Flickable {
                     column.selection = column.selection === vectorDelegate ? null : vectorDelegate
                 }
 
-                onDeleteVector: {
-                    column.selection = null
-                    vectorController.removeVector(model.id)
-                }
             }
         }
     }
