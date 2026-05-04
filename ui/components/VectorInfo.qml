@@ -49,7 +49,7 @@ Rectangle {
     GridLayout {
         anchors.fill: parent
         anchors.margins: 8
-        columns: 4
+        columns: 3
         rows: 1
 
         // Column 1: Vector Name
@@ -84,14 +84,7 @@ Rectangle {
                     }
                 }
 
-                // onEditingFinished: {
 
-                // }
-
-                // onAccepted: {
-                //     vectorName = text
-                //     focus = false
-                // }
                 onActiveFocusChanged: {
                     if (activeFocus) {
 
@@ -166,24 +159,5 @@ Rectangle {
             }
         }
 
-        // column 4: delete
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            color: Material.color(Material.Red)
-            radius: 10
-            Image {
-                source: "../../assets/SVG/trash.svg"
-                anchors.centerIn: parent
-            }
-
-            MouseArea {
-                anchors.fill: parent
-
-                onClicked: {
-                    deleteVector();
-                }
-            }
-        }
     }
 }
