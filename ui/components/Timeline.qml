@@ -12,7 +12,7 @@ Rectangle {
     border.color: Qt.darker(color, 1.2)
     border.width: 1
 
-    required property var serialParser
+    required property var appController
 
     property int currentFrame: 0
     property int maxFrames: 0
@@ -20,12 +20,12 @@ Rectangle {
     property real maxTime: 60.0
 
     function updateTimelineProps() {
-        maxFrames = serialParser.snapshotCount() > 0 ? serialParser.snapshotCount() - 1 : 0;
-        if (serialParser.isConnected) {
+        maxFrames = appController.snapshotCount > 0 ? appController.snapshotCount - 1 : 0;
+        if (appController.isConnected) {
             currentFrame = maxFrames;
         }
-        currentTime = serialParser.snapshotCount() > 0 ? serialParser.timestampAt(currentFrame) / 1000.0 : 0.0;
-        maxTime = serialParser.snapshotCount() > 0 ? serialParser.timestampAt(serialParser.snapshotCount() - 1) / 1000.0 : 60.0;
+        currentTime = appController.snapshotCount > 0 ? appController.timestampAt(currentFrame) / 1000.0 : 0.0;
+        maxTime = appController.snapshotCount > 0 ? appController.timestampAt(appController.snapshotCount - 1) / 1000.0 : 60.0;
     }
 
     Component.onCompleted: updateTimelineProps()
@@ -85,7 +85,7 @@ Rectangle {
             }
 
             Image {
-                source: backButton.enabled ? "./assets/SVG/arrow_left_green.svg" : "./assets/SVG/arrow_left_grey.svg"
+                source: backButton.enabled ? "../../assets/SVG/arrow_left_green.svg" : "../../assets/SVG/arrow_left_grey.svg"
                 anchors.centerIn: parent
                 width: parent.width * 0.6
                 height: parent.height * 0.6
@@ -95,7 +95,7 @@ Rectangle {
             onClicked: {
                 if (timeline.currentFrame > 0) {
                     timeline.currentFrame--;
-                    serialParser.restoreToIndex(currentFrame);
+                    appController.restoreToIndex(currentFrame);
                 }
             }
 
@@ -149,7 +149,7 @@ Rectangle {
             }
 
             Image {
-                source: forwardButton.enabled ? "./assets/SVG/arrow_right_green.svg" : "./assets/SVG/arrow_right_grey.svg"
+                source: forwardButton.enabled ? "../../assets/SVG/arrow_right_green.svg" : "../../assets/SVG/arrow_right_grey.svg"
                 anchors.centerIn: parent
                 width: parent.width * 0.6
                 height: parent.height * 0.6
@@ -159,7 +159,7 @@ Rectangle {
             onClicked: {
                 if (timeline.currentFrame < timeline.maxFrames) {
                     timeline.currentFrame++;
-                    serialParser.restoreToIndex(currentFrame);
+                    appController.restoreToIndex(currentFrame);
                 }
             }
 
@@ -295,13 +295,13 @@ Rectangle {
                     onClicked: function (mouse) {
                         var ratio = Math.max(0, Math.min(1, mouse.x / parent.width));
                         timeline.currentFrame = Math.round(ratio * timeline.maxFrames);
-                        serialParser.restoreToIndex(currentFrame);
+                        appController.restoreToIndex(currentFrame);
                     }
                     onPositionChanged: function (mouse) {
                         if (pressed) {
                             var ratio = Math.max(0, Math.min(1, mouse.x / parent.width));
                             timeline.currentFrame = Math.round(ratio * timeline.maxFrames);
-                            serialParser.restoreToIndex(currentFrame);
+                            appController.restoreToIndex(currentFrame);
                         }
                     }
                     cursorShape: Qt.PointingHandCursor
@@ -353,7 +353,7 @@ Rectangle {
             }
 
             Image {
-                source: "./assets/SVG/download.svg"
+                source: "../../assets/SVG/download.svg"
                 anchors.centerIn: parent
                 width: parent.width * 0.5
                 height: parent.height * 0.5
@@ -374,7 +374,7 @@ Rectangle {
                 modality: Qt.ApplicationModal
                 onAccepted: {
                     if (selectedFile) {
-                        serialParser.saveToFile(selectedFile);
+                        appController.saveToFile(selectedFile);
                     }
                 }
             }
@@ -428,7 +428,7 @@ Rectangle {
             }
 
             Image {
-                source: "./assets/SVG/upload.svg"
+                source: "../../assets/SVG/upload.svg"
                 anchors.centerIn: parent
                 width: parent.width * 0.5
                 height: parent.height * 0.5
@@ -450,7 +450,7 @@ Rectangle {
                 modality: Qt.ApplicationModal
                 onAccepted: {
                     if (selectedFile) {
-                        serialParser.loadFromFile(selectedFile);
+                        appController.loadFromFile(selectedFile);
                         updateTimelineProps();
                     }
                 }

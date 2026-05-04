@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QQmlEngine>
-#include <SensorModel.h>
+#include "../models/SensorModel.h"
 
 class SensorController : public QObject
 {

@@ -1,5 +1,5 @@
 import QtQuick
-import "qml"
+import "./components"
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material
 import com.Roboticus.ControlCenter
@@ -16,13 +16,25 @@ Window {
     Material.theme: Material.Dark
     Material.accent: "#98FF98"
 
+    AppCoordinator {
+        id: appCoordinator
+    }
+
+    AppController {
+        id: appController
+        Component.onCompleted: setModels(sensorController.model, vectorController.model)
+
+
+        onErrorOccurred: function (message) {
+            errorPopup.show(message);
+        }
+    }
+
     SensorController {
         id: sensorController
 
         onSensorAdded: function (id, name, input, threshold, isTriggered, layer, x, y) {
-            if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
-                sensorPanel.addPointToGraph(id, x, y, isTriggered);
-            }
+            appCoordinator.onSensorAdded(sensorPanel, monitor, id, layer, x, y, isTriggered);
         }
 
         onSensorRemoved: function (id) {
@@ -30,9 +42,7 @@ Window {
         }
 
         onSensorUpdated: function (id, name, input, threshold, isTriggered, layer, x, y) {
-            if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
-                sensorPanel.updatePointOnGraph(id, x, y, isTriggered);
-            }
+            appCoordinator.onSensorUpdated(sensorPanel, monitor, id, layer, x, y, isTriggered);
         }
 
         onClearChartSeries: function () {
@@ -48,9 +58,7 @@ Window {
         id: vectorController
 
         onVectorAdded: function (id, name, rotation, scale, color, layer, x, y) {
-            if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
-                sensorPanel.addArrowToGraph(id, rotation, scale, color, x, y);
-            }
+            appCoordinator.onVectorAdded(sensorPanel, monitor, id, rotation, scale, color, layer, x, y);
         }
 
         onVectorRemoved: function (id) {
@@ -58,9 +66,7 @@ Window {
         }
 
         onVectorUpdated: function (id, name, rotation, scale, color, layer, x, y) {
-            if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
-                sensorPanel.updateArrowOnGraph(id, rotation, scale, color, x, y);
-            }
+            appCoordinator.onVectorUpdated(sensorPanel, monitor, id, rotation, scale, color, layer, x, y);
         }
 
         onClearChartSeries: function () {
@@ -72,14 +78,6 @@ Window {
         }
     }
 
-    SerialParser {
-        id: serialParser
-        Component.onCompleted: setModels(sensorController.model, vectorController.model)
-
-        onErrorOccurred: function (message) {
-            errorPopup.show(message);
-        }
-    }
 
     Rectangle {
         anchors.fill: parent
@@ -105,7 +103,7 @@ Window {
     TitleBar {
         id: title
 
-        serialParser: serialParser
+        portManager: appController.portManager
     }
 
     MonitoringPanel {
@@ -137,26 +135,26 @@ Window {
         height: 80
         width: sensorPanel.width
 
-        serialParser: serialParser
+        appController: appController
 
         onCurrentFrameChanged: {
-            if (!serialParser.isConnected) {
-                sensorPanel.clearGraph();
-                serialParser.restoreToIndex(timelineBar.currentFrame);
-            }
-            timelineBar.updateTimelineProps();
+            appCoordinator.onTimelineFrameChanged(appController, sensorPanel, timelineBar);
         }
 
         Connections {
-            target: serialParser
+            target: appController
+
             function onSnapshotsChanged() {
                 timelineBar.updateTimelineProps();
             }
+        }
+
+
+        Connections {
+            target: appController.portManager
+
             function onConnectionChanged() {
-                if (serialParser.isConnected) {
-                    sensorController.setActiveLayer(monitor.selectedSensorLayer);
-                    vectorController.setActiveLayer(monitor.selectedVectorLayer);
-                }
+                appCoordinator.onSerialConnectionChanged(appController, sensorController, vectorController, monitor);
             }
         }
     }

@@ -2,70 +2,117 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Roboticus_control_center VERSION 0.1 LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# 1. Find Packages
 find_package(Qt6 REQUIRED COMPONENTS Quick Graphs SerialPort Gui)
 
 qt_standard_project_setup(REQUIRES 6.11)
 
-qt_add_executable(appRoboticus_control_center
-    main.cpp
-)
-
+# 2. Add External Libraries (qmsgpack)
 add_subdirectory(libs/qmsgpack)
 
-qt_add_qml_module(appRoboticus_control_center
-    URI com.Roboticus.ControlCenter
-    QML_FILES
-        Main.qml
-        qml/SensorPanel.qml
-        qml/SensorInfo.qml
-        qml/AddItem.qml
-        qml/SinglePointSeries.qml
-        qml/VectorArrow.qml
-        qml/VectorInfo.qml
-        qml/MonitoringPanel.qml
-        qml/Error.qml
-        qml/TitleBar.qml
-        qml/Timeline.qml
-
-    RESOURCES
-        qml/assets/SVG/add.svg
-        qml/assets/SVG/remove.svg
-        qml/assets/SVG/arrow.svg
-        qml/assets/SVG/trash.svg
-
-    SOURCES
-        SensorController.h SensorController.cpp
-        SensorModel.cpp SensorModel.h
-
-        VectorController.h VectorController.cpp
-        VectorModel.h VectorModel.cpp
-
-        SerialParser.h SerialParser.cpp
-
-        RESOURCES qml/assets/SVG/arrow_left_green.svg qml/assets/SVG/arrow_left_grey.svg qml/assets/SVG/arrow_right_green.svg qml/assets/SVG/arrow_right_grey.svg
-        RESOURCES qml/assets/SVG/download.svg qml/assets/SVG/upload.svg
-
+# 3. Define the Main Executable
+qt_add_executable(appRoboticus_control_center
+    "src/main.cpp"
 )
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
+# 4. Define the QML Module
+# This combines the logic and UI into one importable URI.
+qt_add_qml_module(appRoboticus_control_center
+    URI com.Roboticus.ControlCenter
+    VERSION 1.0
+
+    # Virtual paths in QRC will match these relative paths
+    QML_FILES
+        "ui/Main.qml"
+        "ui/components/SensorPanel.qml"
+        "ui/components/SensorInfo.qml"
+        "ui/components/AddItem.qml"
+        "ui/components/SinglePointSeries.qml"
+        "ui/components/VectorArrow.qml"
+        "ui/components/VectorInfo.qml"
+        "ui/components/MonitoringPanel.qml"
+        "ui/components/Error.qml"
+        "ui/components/TitleBar.qml"
+        "ui/components/Timeline.qml"
+        "ui/components/AppCoordinator.qml"
+
+    RESOURCES
+        "assets/SVG/add.svg"
+        "assets/SVG/remove.svg"
+        "assets/SVG/arrow.svg"
+        "assets/SVG/trash.svg"
+        "assets/SVG/arrow_left_green.svg"
+        "assets/SVG/arrow_left_grey.svg"
+        "assets/SVG/arrow_right_green.svg"
+        "assets/SVG/arrow_right_grey.svg"
+        "assets/SVG/download.svg"
+        "assets/SVG/upload.svg"
+
+    SOURCES
+        # Controllers (Contain QML_ELEMENT)
+        "include/controllers/AppController.h"
+        "src/controllers/AppController.cpp"
+        "include/controllers/SensorController.h"
+        "src/controllers/SensorController.cpp"
+        "include/controllers/VectorController.h"
+        "src/controllers/VectorController.cpp"
+        "include/controllers/ControllerUtils.h"
+
+        # Models
+        "include/models/SensorModel.h"
+        "src/models/SensorModel.cpp"
+        "include/models/VectorModel.h"
+        "src/models/VectorModel.cpp"
+
+        # IO (Hardware/Stream Handling)
+        "include/io/SerialParser.h"
+        "src/io/SerialParser.cpp"
+        "include/io/SerialPortManager.h"
+        "src/io/SerialPortManager.cpp"
+
+        # Parser (Pure Logic)
+        "include/parser/FrameTypes.h"
+        "include/parser/SerialFrameExtractor.h"
+        "src/parser/SerialFrameExtractor.cpp"
+        "include/parser/SnapshotStore.h"
+        "src/parser/SnapshotStore.cpp"
+        "include/parser/SnapshotLoader.h"
+        "src/parser/SnapshotLoader.cpp"
+)
+
+# 5. Include Directories
+# This allows you to use #include "io/SerialParser.h" instead of relative paths
+target_include_directories(appRoboticus_control_center PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/controllers"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/models"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/io"
+   "${CMAKE_CURRENT_SOURCE_DIR}/include/parser"
+    "libs" # For qmsgpack
+)
+
+# 6. Link Libraries
+target_link_libraries(appRoboticus_control_center
+    PRIVATE
+        Qt6::Quick
+        Qt6::Graphs
+        Qt6::SerialPort
+        Qt6::Gui
+        qmsgpack
+)
+
+# 7. OS Specific Configuration
 set_target_properties(appRoboticus_control_center PROPERTIES
-#    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appRoboticus_control_center
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
 
-target_include_directories(appRoboticus_control_center PRIVATE libs)
-
-target_link_libraries(appRoboticus_control_center
-    PRIVATE Qt6::Quick Qt6::Graphs Qt6::SerialPort Qt6::Gui qmsgpack
-)
-
+# 8. Installation
 include(GNUInstallDirs)
 install(TARGETS appRoboticus_control_center
     BUNDLE DESTINATION .

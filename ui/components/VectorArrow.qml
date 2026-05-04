@@ -25,7 +25,7 @@ ScatterSeries {
         Image {
             id: arrowImage
             anchors.fill: parent
-            source: "./assets/SVG/arrow.svg"
+            source: "../../assets/SVG/arrow.svg"
             width: parent.width
             height: parent.height
             sourceSize: Qt.size(width * 2, height * 2)

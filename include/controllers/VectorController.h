@@ -3,8 +3,7 @@
 
 #include <QObject>
 #include <QQmlEngine>
-#include <SensorModel.h>
-#include <VectorModel.h>
+#include "../models/VectorModel.h"
 
 class VectorController : public QObject
 {
