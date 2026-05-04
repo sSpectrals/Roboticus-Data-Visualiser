@@ -14,7 +14,6 @@ Rectangle {
     property bool selected: false
 
     signal clicked
-    signal deleteVector
 
     color: "black"
     radius: 10

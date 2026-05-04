@@ -14,7 +14,6 @@ Rectangle {
     property bool isTriggered: true
 
     signal clicked
-    signal deleteSensor
 
     color: "black"
     radius: 10
