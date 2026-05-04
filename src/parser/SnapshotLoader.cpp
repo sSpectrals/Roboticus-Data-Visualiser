@@ -5,6 +5,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+SnapshotLoader::SnapshotLoader(QObject *parent) : QObject(parent) {}
+
 bool SnapshotLoader::save(const QUrl &filePath,
                           const QList<FrameSnapshot> &snapshots,
                           QString *errorMessage) const {

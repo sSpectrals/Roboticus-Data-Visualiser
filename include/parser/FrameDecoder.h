@@ -4,7 +4,7 @@
 #include "parser/FrameTypes.h"
 #include <QByteArray>
 #include <QVariant>
-#include <qmsgpack/msgpack.h>
+#include <msgpack.h>
 
 class FrameDecoder {
 public:

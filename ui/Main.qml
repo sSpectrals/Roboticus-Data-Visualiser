@@ -20,6 +20,16 @@ Window {
         id: appCoordinator
     }
 
+    AppController {
+        id: appController
+        Component.onCompleted: setModels(sensorController.model, vectorController.model)
+
+
+        onErrorOccurred: function (message) {
+            errorPopup.show(message);
+        }
+    }
+
     SensorController {
         id: sensorController
 
@@ -69,24 +79,6 @@ Window {
     }
 
 
-
-    SerialPortManager {
-        id: serialPortManager
-        onErrorOccurred: function (message) {
-            errorPopup.show(message);
-        }
-    }
-
-    SerialParser {
-        id: serialParser
-        portManager: serialPortManager
-        Component.onCompleted: setModels(sensorController.model, vectorController.model)
-
-        onErrorOccurred: function (message) {
-            errorPopup.show(message);
-        }
-    }
-
     Rectangle {
         anchors.fill: parent
         gradient: Gradient {
@@ -111,7 +103,7 @@ Window {
     TitleBar {
         id: title
 
-        portManager: serialPortManager
+        portManager: appController.portManager
     }
 
     MonitoringPanel {
@@ -143,14 +135,14 @@ Window {
         height: 80
         width: sensorPanel.width
 
-        serialParser: serialParser
+        appController: appController
 
         onCurrentFrameChanged: {
-            appCoordinator.onTimelineFrameChanged(serialPortManager, serialParser, sensorPanel, timelineBar);
+            appCoordinator.onTimelineFrameChanged(appController, sensorPanel, timelineBar);
         }
 
         Connections {
-            target: serialParser
+            target: appController
 
             function onSnapshotsChanged() {
                 timelineBar.updateTimelineProps();
@@ -159,10 +151,10 @@ Window {
 
 
         Connections {
-            target: serialPortManager
+            target: appController.portManager
 
             function onConnectionChanged() {
-                appCoordinator.onSerialConnectionChanged(serialPortManager, sensorController, vectorController, monitor);
+                appCoordinator.onSerialConnectionChanged(appController, sensorController, vectorController, monitor);
             }
         }
     }

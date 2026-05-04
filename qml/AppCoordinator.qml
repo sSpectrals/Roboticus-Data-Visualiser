@@ -25,16 +25,16 @@ QtObject {
         }
     }
 
-    function onTimelineFrameChanged(serialPortManager, serialParser, sensorPanel, timelineBar) {
-        if (!serialPortManager.isConnected) {
+    function onTimelineFrameChanged(appController, sensorPanel, timelineBar) {
+        if (!appController.portManager.isConnected) {
             sensorPanel.clearGraph()
-            serialParser.restoreToIndex(timelineBar.currentFrame)
+            appController.restoreToIndex(timelineBar.currentFrame)
         }
         timelineBar.updateTimelineProps()
     }
 
-    function onSerialConnectionChanged(serialPortManager, sensorController, vectorController, monitor) {
-        if (serialPortManager.isConnected) {
+    function onSerialConnectionChanged(appController, sensorController, vectorController, monitor) {
+        if (appController.portManager.isConnected) {
             sensorController.setActiveLayer(monitor.selectedSensorLayer)
             vectorController.setActiveLayer(monitor.selectedVectorLayer)
         }
