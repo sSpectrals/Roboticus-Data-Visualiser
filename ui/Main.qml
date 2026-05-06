@@ -34,7 +34,7 @@ Window {
         id: sensorController
 
         onSensorAdded: function (id, name, input, threshold, isTriggered, layer, x, y) {
-            appCoordinator.onSensorAdded(sensorPanel, monitor, id, layer, x, y, isTriggered);
+            appCoordinator.onSensorAdded(sensorPanel, monitor, name, input, threshold, isTriggered, x, y, layer);
         }
 
         onSensorRemoved: function (id) {
@@ -42,11 +42,11 @@ Window {
         }
 
         onSensorUpdated: function (id, name, input, threshold, isTriggered, layer, x, y) {
-            appCoordinator.onSensorUpdated(sensorPanel, monitor, id, layer, x, y, isTriggered);
+            appCoordinator.onSensorUpdated(sensorPanel, monitor, name, input, threshold, isTriggered, x, y, layer);
         }
 
         onClearChartSeries: function () {
-            sensorPanel.clearPoints();
+            sensorPanel.clearSensorsOnGraph();
         }
 
         onErrorOccurred: function (message) {

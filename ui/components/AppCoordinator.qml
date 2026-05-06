@@ -1,15 +1,15 @@
 import QtQuick
 
 QtObject {
-    function onSensorAdded(sensorPanel, monitor, id, layer, x, y, isTriggered) {
+    function onSensorAdded(sensorPanel, monitor, name, input, threshold, isTriggered, x, y, layer) {
         if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
-            sensorPanel.addPointToGraph(id, x, y, isTriggered)
+            sensorPanel.addSensorToGraph(name, input, threshold, isTriggered, x, y)
         }
     }
 
-    function onSensorUpdated(sensorPanel, monitor, id, layer, x, y, isTriggered) {
+    function onSensorUpdated(sensorPanel, monitor, name, input, threshold, isTriggered, x, y, layer) {
         if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
-            sensorPanel.updatePointOnGraph(id, x, y, isTriggered)
+            sensorPanel.updateSensorOnGraph(name, input, threshold, isTriggered, x, y)
         }
     }
 
@@ -26,10 +26,8 @@ QtObject {
     }
 
     function onTimelineFrameChanged(appController, sensorPanel, timelineBar) {
-        if (!appController.portManager.isConnected) {
-            sensorPanel.clearGraph()
-            appController.restoreToIndex(timelineBar.currentFrame)
-        }
+        sensorPanel.clearGraph()
+        appController.restoreToIndex(timelineBar.currentFrame)
         timelineBar.updateTimelineProps()
     }
 

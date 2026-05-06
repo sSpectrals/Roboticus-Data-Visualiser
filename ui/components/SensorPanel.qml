@@ -52,57 +52,62 @@ Rectangle {
             zoom: axisX.zoom
         }
 
-        // ! Bug: zooming out breaks screen pixel to chart point mapper (in SinglePointSeries.qml and VectorArrow.qml)
+        WheelHandler {
+            target: chart
+            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
 
-        // WheelHandler {
-        //     target: chart
-        //     acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+            onWheel: function (event) {
+                let delta = event.angleDelta.y
+                let zoomFactor = delta > 0 ? 1.1 : 0.9
 
-        //     onWheel: function (event) {
-        //         let delta = event.angleDelta.y
-        //         let zoomFactor = delta > 0 ? 1.1 : 0.9
+                axisX.zoom *= zoomFactor
 
-        //         axisX.zoom *= zoomFactor
+                axisX.zoom = Math.max(0.5, Math.min(4, axisX.zoom))
+            }
+        }
 
-        //         axisX.zoom = Math.max(0.5, Math.min(4, axisX.zoom))
-        //     }
-        // }
     }
 
-    property var pointSeriesMap: ({})
+    property var sensorSeriesMap: ({})
     property var arrowSeriesMap: ({})
 
-    function addPointToGraph(id, x, y, trig) {
+    function addSensorToGraph(name, input, threshold, trig, x, y) {
         var component = Qt.createComponent("SinglePointSeries.qml");
         if (component.status === Component.Ready) {
             var series = component.createObject(chart, {
-                "sensorId": id,
-                "pointX": x,
-                "pointY": y,
-                "isTriggered": trig
+                "sensorName": name,
+                "input": input,
+                "threshold": threshold,
+                "isTriggered": trig,
+                "posX": x,
+                "posY": y
             });
 
             chart.addSeries(series);
-            pointSeriesMap[id] = series;
+            sensorSeriesMap[name] = series;
         }
     }
 
-    function removePointFromGraph(id) {
-        var series = pointSeriesMap[id];
+    function removeSensorFromGraph(name) {
+        var series = sensorSeriesMap[name];
         if (series) {
             chart.removeSeries(series);
 
-            delete pointSeriesMap[id];
+            delete sensorSeriesMap[name];
 
             series.destroy(100);
+            sensorSeriesMap = sensorSeriesMap
         }
     }
 
-    function updatePointOnGraph(id, x, y, trig) {
-        var series = pointSeriesMap[id];
+    function updateSensorOnGraph(name, input, threshold, trig, x, y) {
+        var series = sensorSeriesMap[name];
         if (series) {
-            series.pointX = x;
-            series.pointY = y;
+            series.sensorName = name;
+            series.input = input;
+            series.threshold = threshold;
+            series.posX = x;
+            series.posY = y;
             series.isTriggered = trig;
         }
     }
@@ -146,15 +151,16 @@ Rectangle {
         }
     }
 
-    function clearPoints() {
-        for (var id in pointSeriesMap) {
-            var series = pointSeriesMap[id];
+    function clearSensorsOnGraph() {
+        for (var name in sensorSeriesMap) {
+            var series = sensorSeriesMap[name];
             if (series) {
                 chart.removeSeries(series);
                 series.destroy(100);
+                sensorSeriesMap = sensorSeriesMap
             }
         }
-        pointSeriesMap = {};
+        sensorSeriesMap = {};
     }
 
     function clearArrows() {
@@ -169,7 +175,7 @@ Rectangle {
     }
 
     function clearGraph() {
-        clearPoints();
+        clearSensorsOnGraph();
         clearArrows();
     }
 }
