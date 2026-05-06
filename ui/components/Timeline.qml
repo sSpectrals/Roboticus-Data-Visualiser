@@ -95,7 +95,6 @@ Rectangle {
             onClicked: {
                 if (timeline.currentFrame > 0) {
                     timeline.currentFrame--;
-                    appController.restoreToIndex(currentFrame);
                 }
             }
 
@@ -159,7 +158,6 @@ Rectangle {
             onClicked: {
                 if (timeline.currentFrame < timeline.maxFrames) {
                     timeline.currentFrame++;
-                    appController.restoreToIndex(currentFrame);
                 }
             }
 
@@ -295,13 +293,11 @@ Rectangle {
                     onClicked: function (mouse) {
                         var ratio = Math.max(0, Math.min(1, mouse.x / parent.width));
                         timeline.currentFrame = Math.round(ratio * timeline.maxFrames);
-                        appController.restoreToIndex(currentFrame);
                     }
                     onPositionChanged: function (mouse) {
                         if (pressed) {
                             var ratio = Math.max(0, Math.min(1, mouse.x / parent.width));
                             timeline.currentFrame = Math.round(ratio * timeline.maxFrames);
-                            appController.restoreToIndex(currentFrame);
                         }
                     }
                     cursorShape: Qt.PointingHandCursor

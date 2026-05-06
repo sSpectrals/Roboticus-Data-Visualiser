@@ -70,7 +70,7 @@ void AppController::updateSensorsFromFrame(const QVariantList &sensors) {
 
     int idx = m_sensorModel->getIndexByName(name);
     if (idx >= 0) {
-    // Update existing sensor in the model
+      // Update existing sensor in the model
       QModelIndex modelIdx = m_sensorModel->index(idx);
       m_sensorModel->setData(modelIdx, input, SensorModel::InputRole);
       m_sensorModel->setData(modelIdx, threshold, SensorModel::ThresholdRole);
@@ -79,7 +79,7 @@ void AppController::updateSensorsFromFrame(const QVariantList &sensors) {
       m_sensorModel->setData(modelIdx, y, SensorModel::YRole);
       m_sensorModel->setData(modelIdx, layer, SensorModel::LayerRole);
     } else {
-    // Add new sensor to the model
+      // Add new sensor to the model
       m_sensorModel->addSensor(name, input, threshold, isTriggered, layer, x,
                                y);
     }
@@ -151,27 +151,24 @@ bool AppController::restoreToIndex(int index) {
   if (!m_snapshotStore.isValidIndex(index))
     return false;
 
-
   m_portManager->disconnectPort();
 
   const FrameSnapshot snapshot = m_snapshotStore.at(index);
-  if (m_sensorModel)
-    m_sensorModel->clear();
-  if (m_vectorModel)
-    m_vectorModel->clear();
 
   if (m_sensorModel) {
-      m_sensorModel->clear();
-      for (const auto &s : snapshot.sensors) {
-          m_sensorModel->addSensor(s.name, s.inputValue, s.threshold, s.isTriggered, s.layer, s.x, s.y);
-      }
+    m_sensorModel->clear();
+    for (const auto &s : snapshot.sensors) {
+      m_sensorModel->addSensor(s.name, s.inputValue, s.threshold, s.isTriggered,
+                               s.layer, s.x, s.y);
+    }
   }
 
   if (m_vectorModel) {
-      m_vectorModel->clear();
-      for (const auto &v : snapshot.vectors) {
-          m_vectorModel->addVector(v.name, v.rotation, v.scale, v.color, v.layer, v.x, v.y);
-      }
+    m_vectorModel->clear();
+    for (const auto &v : snapshot.vectors) {
+      m_vectorModel->addVector(v.name, v.rotation, v.scale, v.color, v.layer,
+                               v.x, v.y);
+    }
   }
 
   return true;
