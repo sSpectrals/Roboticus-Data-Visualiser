@@ -58,7 +58,7 @@ Window {
         id: vectorController
 
         onVectorAdded: function (id, name, rotation, scale, color, layer, x, y) {
-            appCoordinator.onVectorAdded(sensorPanel, monitor, id, rotation, scale, color, layer, x, y);
+            appCoordinator.onVectorAdded(sensorPanel, monitor, name, rotation, scale, color, layer, x, y);
         }
 
         onVectorRemoved: function (id) {
@@ -66,11 +66,11 @@ Window {
         }
 
         onVectorUpdated: function (id, name, rotation, scale, color, layer, x, y) {
-            appCoordinator.onVectorUpdated(sensorPanel, monitor, id, rotation, scale, color, layer, x, y);
+            appCoordinator.onVectorUpdated(sensorPanel, monitor, name, rotation, scale, color, layer, x, y);
         }
 
         onClearChartSeries: function () {
-            sensorPanel.clearArrows();
+            sensorPanel.clearVectorsOnGraph();
         }
 
         onErrorOccurred: function (message) {

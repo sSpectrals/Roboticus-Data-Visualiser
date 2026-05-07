@@ -13,15 +13,15 @@ QtObject {
         }
     }
 
-    function onVectorAdded(sensorPanel, monitor, id, rotation, scale, color, layer, x, y) {
+    function onVectorAdded(sensorPanel, monitor, name, rotation, scale, color, layer, x, y) {
         if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
-            sensorPanel.addArrowToGraph(id, rotation, scale, color, x, y)
+            sensorPanel.addVectorToGraph(name, rotation, scale, color, x, y)
         }
     }
 
-    function onVectorUpdated(sensorPanel, monitor, id, rotation, scale, color, layer, x, y) {
+    function onVectorUpdated(sensorPanel, monitor, name, rotation, scale, color, layer, x, y) {
         if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
-            sensorPanel.updateArrowOnGraph(id, rotation, scale, color, x, y)
+            sensorPanel.updateVectorOnGraph(name, rotation, scale, color, x, y)
         }
     }
 

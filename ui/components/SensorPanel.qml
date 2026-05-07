@@ -69,7 +69,7 @@ Rectangle {
     }
 
     property var sensorSeriesMap: ({})
-    property var arrowSeriesMap: ({})
+    property var vectorSeriesMap: ({})
 
     function addSensorToGraph(name, input, threshold, trig, x, y) {
         var component = Qt.createComponent("SinglePointSeries.qml");
@@ -96,14 +96,12 @@ Rectangle {
             delete sensorSeriesMap[name];
 
             series.destroy(100);
-            sensorSeriesMap = sensorSeriesMap
         }
     }
 
     function updateSensorOnGraph(name, input, threshold, trig, x, y) {
         var series = sensorSeriesMap[name];
         if (series) {
-            series.sensorName = name;
             series.input = input;
             series.threshold = threshold;
             series.posX = x;
@@ -112,42 +110,42 @@ Rectangle {
         }
     }
 
-    function addArrowToGraph(id, rotation, scale, arrowColor, x, y) {
+    function addVectorToGraph(name, rotation, scale, arrowColor, x, y) {
         var component = Qt.createComponent("VectorArrow.qml");
         if (component.status === Component.Ready) {
             var series = component.createObject(chart, {
-                "vectorId": id,
+                "vectorName": name,
+                "vectorRotation": rotation,
+                "vectorScale": scale,
+                "vectorColor": arrowColor,
                 "vecX": x,
-                "vecY": y,
-                "arrowRotation": rotation,
-                "arrowScale": scale,
-                "arrowColor": arrowColor
+                "vecY": y
             });
 
             chart.addSeries(series);
-            arrowSeriesMap[id] = series;
+            vectorSeriesMap[name] = series;
         }
     }
 
-    function removeArrowFromGraph(id) {
-        var series = arrowSeriesMap[id];
+    function removeVectorFromGraph(name) {
+        var series = vectorSeriesMap[name];
         if (series) {
             chart.removeSeries(series);
 
-            delete arrowSeriesMap[id];
+            delete vectorSeriesMap[name];
 
             series.destroy(100);
         }
     }
 
-    function updateArrowOnGraph(id, rotation, scale, arrowColor, x, y) {
-        var series = arrowSeriesMap[id];
+    function updateVectorOnGraph(name, rotation, scale, color, x, y) {
+        var series = vectorSeriesMap[name];
         if (series) {
             series.vecX = x;
             series.vecY = y;
-            series.arrowRotation = rotation;
-            series.arrowScale = scale;
-            series.arrowColor = arrowColor;
+            series.vectorRotation = rotation;
+            series.vectorScale = scale;
+            series.vectorColor = color;
         }
     }
 
@@ -157,25 +155,24 @@ Rectangle {
             if (series) {
                 chart.removeSeries(series);
                 series.destroy(100);
-                sensorSeriesMap = sensorSeriesMap
             }
         }
         sensorSeriesMap = {};
     }
 
-    function clearArrows() {
-        for (var id in arrowSeriesMap) {
-            var series = arrowSeriesMap[id];
+    function clearVectorsOnGraph() {
+        for (var name in vectorSeriesMap) {
+            var series = vectorSeriesMap[name];
             if (series) {
                 chart.removeSeries(series);
                 series.destroy(100);
             }
         }
-        arrowSeriesMap = {};
+        vectorSeriesMap = {};
     }
 
     function clearGraph() {
         clearSensorsOnGraph();
-        clearArrows();
+        clearVectorsOnGraph();
     }
 }
