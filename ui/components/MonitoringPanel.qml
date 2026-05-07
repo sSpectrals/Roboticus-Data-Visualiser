@@ -14,6 +14,15 @@ Flickable {
     clip: true
     boundsBehavior: Flickable.StopAtBounds
 
+    anchors {
+        left: parent.left
+        top: title.bottom
+        bottom: timelineBar.top
+        bottomMargin: 20
+        leftMargin: 20
+        rightMargin: 20
+    }
+
     required property var sensorController
     required property var vectorController
 

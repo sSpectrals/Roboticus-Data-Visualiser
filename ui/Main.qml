@@ -4,7 +4,6 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material
 import com.Roboticus.ControlCenter
 
-//TODO: note to self, column.selectedSensor/onClicked is unused, possible to use for something else? idk
 Window {
     id: window
     visibility: Window.Maximized
@@ -29,9 +28,6 @@ Window {
     SensorController {
         id: sensorController
 
-        onSensorRemoved: function (id) {
-            sensorController.setActiveLayer(monitor.selectedSensorLayer);
-        }
 
         onClearChartSeries: function () {
             sensorPanel.clearSensorsOnGraph();
@@ -44,10 +40,6 @@ Window {
 
     VectorController {
         id: vectorController
-
-        onVectorRemoved: function (id) {
-            vectorController.setActiveLayer(monitor.selectedVectorLayer);
-        }
 
         onClearChartSeries: function () {
             sensorPanel.clearVectorsOnGraph();
@@ -76,8 +68,6 @@ Window {
 
     SensorPanel {
         id: sensorPanel
-        anchors.bottom: timelineBar.top
-        anchors.bottomMargin: 10
 
         Connections {
             target: sensorController
@@ -129,31 +119,13 @@ Window {
     MonitoringPanel {
         id: monitor
 
-        anchors {
-            left: parent.left
-            top: title.bottom
-            bottom: timelineBar.top
-            bottomMargin: 20
-            leftMargin: 20
-            rightMargin: 20
-        }
-
         sensorController: sensorController
         vectorController: vectorController
     }
 
     Timeline {
         id: timelineBar
-        anchors {
-            right: parent.right
-            bottom: parent.bottom
-            left: parent.left
-            leftMargin: 20
-            rightMargin: 20
-            bottomMargin: 20
-        }
-        height: 80
-        width: sensorPanel.width
+
 
         appController: appController
 
@@ -188,20 +160,4 @@ Window {
         id: errorPopup
     }
 
-    // AddItem {
-    //     id: addSensorButton
-    //     anchors {
-    //         left: parent.left
-    //         bottom: parent.bottom
-    //         leftMargin: 20
-    //         bottomMargin: 20
-    //     }
-    //     height: 70
-    //     width: (parent.width) / 2
-
-    //     onAddSensorRequested: {
-    //         sensorController.addSensor("Sensor name", 0, 100, false, "Layer 2", 0.0, 0.0);
-    //     }
-    //     onAddVectorRequested: vectorController.addVector("Vector name", 0.0, 1, "white", 1, 0.0, 0.0)
-    // }
 }

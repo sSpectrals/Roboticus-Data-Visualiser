@@ -11,6 +11,16 @@ Rectangle {
     radius: 12
     border.color: Qt.darker(color, 1.2)
     border.width: 1
+    anchors {
+        right: parent.right
+        bottom: parent.bottom
+        left: parent.left
+        leftMargin: 20
+        rightMargin: 20
+        bottomMargin: 20
+    }
+    height: 80
+    width: sensorPanel.width
 
     required property var appController
 

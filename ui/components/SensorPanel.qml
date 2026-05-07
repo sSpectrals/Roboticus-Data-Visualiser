@@ -13,8 +13,11 @@ Rectangle {
         left: monitor.right
         top: parent.top
         right: parent.right
+        bottom: timelineBar.top
         margins: 20
+        bottomMargin: 10
     }
+
 
 
     GraphsView {
