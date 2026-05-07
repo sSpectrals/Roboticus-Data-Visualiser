@@ -29,7 +29,7 @@ qt_add_qml_module(appRoboticus_control_center
         "ui/Main.qml"
         "ui/components/SensorPanel.qml"
         "ui/components/SensorInfo.qml"
-        "ui/components/AddItem.qml"
+
         "ui/components/SinglePointSeries.qml"
         "ui/components/VectorArrow.qml"
         "ui/components/VectorInfo.qml"
@@ -37,7 +37,7 @@ qt_add_qml_module(appRoboticus_control_center
         "ui/components/Error.qml"
         "ui/components/TitleBar.qml"
         "ui/components/Timeline.qml"
-        "ui/components/AppCoordinator.qml"
+
 
     RESOURCES
         "assets/SVG/add.svg"

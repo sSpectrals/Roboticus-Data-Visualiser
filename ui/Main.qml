@@ -16,10 +16,6 @@ Window {
     Material.theme: Material.Dark
     Material.accent: "#98FF98"
 
-    AppCoordinator {
-        id: appCoordinator
-    }
-
     AppController {
         id: appController
         Component.onCompleted: setModels(sensorController.model, vectorController.model)
@@ -33,16 +29,8 @@ Window {
     SensorController {
         id: sensorController
 
-        onSensorAdded: function (id, name, input, threshold, isTriggered, layer, x, y) {
-            appCoordinator.onSensorAdded(sensorPanel, monitor, name, input, threshold, isTriggered, x, y, layer);
-        }
-
         onSensorRemoved: function (id) {
             sensorController.setActiveLayer(monitor.selectedSensorLayer);
-        }
-
-        onSensorUpdated: function (id, name, input, threshold, isTriggered, layer, x, y) {
-            appCoordinator.onSensorUpdated(sensorPanel, monitor, name, input, threshold, isTriggered, x, y, layer);
         }
 
         onClearChartSeries: function () {
@@ -57,16 +45,8 @@ Window {
     VectorController {
         id: vectorController
 
-        onVectorAdded: function (id, name, rotation, scale, color, layer, x, y) {
-            appCoordinator.onVectorAdded(sensorPanel, monitor, name, rotation, scale, color, layer, x, y);
-        }
-
         onVectorRemoved: function (id) {
             vectorController.setActiveLayer(monitor.selectedVectorLayer);
-        }
-
-        onVectorUpdated: function (id, name, rotation, scale, color, layer, x, y) {
-            appCoordinator.onVectorUpdated(sensorPanel, monitor, name, rotation, scale, color, layer, x, y);
         }
 
         onClearChartSeries: function () {
@@ -98,6 +78,46 @@ Window {
         id: sensorPanel
         anchors.bottom: timelineBar.top
         anchors.bottomMargin: 10
+
+        Connections {
+            target: sensorController
+
+            function onSensorAdded(id, name, input, threshold, isTriggered, layer, x, y) {
+                if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
+                    sensorPanel.addSensorToGraph(name, input, threshold, isTriggered, x, y)
+                }
+            }
+
+            function onSensorUpdated(id, name, input, threshold, isTriggered, layer, x, y) {
+                if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
+                    sensorPanel.updateSensorOnGraph(name, input, threshold, isTriggered, x, y)
+                }
+            }
+
+            function onClearChartSeries() {
+                sensorPanel.clearSensorsOnGraph()
+            }
+        }
+
+        Connections {
+            target: vectorController
+
+            function onVectorAdded(id, name, rotation, scale, color, layer, x, y) {
+                if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
+                    sensorPanel.addVectorToGraph(name, rotation, scale, color, x, y)
+                }
+            }
+
+            function onVectorUpdated(id, name, rotation, scale, color, layer, x, y) {
+                if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
+                    sensorPanel.updateVectorOnGraph(name, rotation, scale, color, x, y)
+                }
+            }
+
+            function onClearChartSeries() {
+                sensorPanel.clearVectorsOnGraph()
+            }
+        }
     }
 
     TitleBar {
@@ -138,7 +158,9 @@ Window {
         appController: appController
 
         onCurrentFrameChanged: {
-            appCoordinator.onTimelineFrameChanged(appController, sensorPanel, timelineBar);
+            sensorPanel.clearGraph()
+            appController.restoreToIndex(timelineBar.currentFrame)
+            timelineBar.updateTimelineProps()
         }
 
         Connections {
@@ -154,7 +176,10 @@ Window {
             target: appController.portManager
 
             function onConnectionChanged() {
-                appCoordinator.onSerialConnectionChanged(appController, sensorController, vectorController, monitor);
+                if (appController.portManager.isConnected) {
+                    sensorController.setActiveLayer(monitor.selectedSensorLayer)
+                    vectorController.setActiveLayer(monitor.selectedVectorLayer)
+                }
             }
         }
     }

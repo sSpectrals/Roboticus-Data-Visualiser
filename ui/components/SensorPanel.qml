@@ -16,6 +16,7 @@ Rectangle {
         margins: 20
     }
 
+
     GraphsView {
         id: chart
         anchors {
