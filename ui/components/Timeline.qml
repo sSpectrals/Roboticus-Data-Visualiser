@@ -377,6 +377,7 @@ Rectangle {
                 fileMode: FileDialog.SaveFile
                 title: "Save Serial Data"
                 nameFilters: ["JSON Files (*.json)"]
+                defaultSuffix: "json"
                 modality: Qt.ApplicationModal
                 onAccepted: {
                     if (selectedFile) {

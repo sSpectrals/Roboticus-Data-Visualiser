@@ -127,7 +127,7 @@ bool SnapshotLoader::load(const QUrl &filePath, QList<FrameSnapshot> *snapshots,
 
     const QJsonObject snapshotObject = snapshotValue.toObject();
     FrameSnapshot snapshot;
-    snapshot.timestamp = snapshotObject["timestamp"].toInteger();
+    snapshot.timestamp = snapshotObject["timestamp"].toVariant().toLongLong();
 
     const QJsonArray sensorsArray = snapshotObject["sensors"].toArray();
     for (const QJsonValue &sensorValue : sensorsArray) {
