@@ -12,6 +12,10 @@ AppController::AppController(QObject *parent) : QObject(parent) {
   connect(m_parser, &SerialParser::frameDecoded, this,
           &AppController::onFrameParsed);
 
+  // Clear snapshot list when port connection is started
+  connect(m_portManager, &SerialPortManager::connectionChanged, this,
+          &AppController::onPortConnectionChanged);
+
   // Forward errors to UI
   connect(m_portManager, &SerialPortManager::errorOccurred, this,
           &AppController::errorOccurred);
@@ -172,6 +176,13 @@ bool AppController::restoreToIndex(int index) {
   }
 
   return true;
+}
+
+void AppController::onPortConnectionChanged() {
+  if (m_portManager && m_portManager->isConnected()) {
+    m_snapshotStore.clear();
+    emit snapshotsChanged();
+  }
 }
 
 QList<qint64> AppController::availableTimestamps() const {

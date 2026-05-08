@@ -48,6 +48,7 @@ signals:
 
 private slots:
   void onFrameParsed(const DecodedFrame &frame);
+  void onPortConnectionChanged();
 
 private:
   // Members
