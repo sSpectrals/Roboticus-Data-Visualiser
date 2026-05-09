@@ -9,7 +9,7 @@ Window {
     visibility: Window.Maximized
     minimumWidth: 950
     minimumHeight: 480
-    title: qsTr("Roboticus Control Center")
+    title: "Roboticus Control Center"
     color: "#1a1a1a"
 
     Material.theme: Material.Dark
@@ -22,6 +22,10 @@ Window {
 
         onErrorOccurred: function (message) {
             errorPopup.show(message);
+        }
+
+        onSnapshotsChanged: function() {
+            timelineBar.updateTimelineProps();
         }
     }
 
@@ -36,6 +40,20 @@ Window {
         onErrorOccurred: function (message) {
             errorPopup.show(message);
         }
+
+
+
+        onSensorAdded: function(id, name, input, threshold, isTriggered, layer, x, y) {
+            if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
+                sensorPanel.addSensorToGraph(name, input, threshold, isTriggered, x, y)
+            }
+        }
+
+        onSensorUpdated: function(id, name, input, threshold, isTriggered, layer, x, y) {
+            if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
+                sensorPanel.updateSensorOnGraph(name, input, threshold, isTriggered, x, y)
+            }
+        }
     }
 
     VectorController {
@@ -47,6 +65,19 @@ Window {
 
         onErrorOccurred: function (message) {
             errorPopup.show(message);
+        }
+
+
+        onVectorAdded: function(id, name, rotation, scale, color, layer, x, y) {
+            if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
+                sensorPanel.addVectorToGraph(name, rotation, scale, color, x, y)
+            }
+        }
+
+        onVectorUpdated: function(id, name, rotation, scale, color, layer, x, y) {
+            if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
+                sensorPanel.updateVectorOnGraph(name, rotation, scale, color, x, y)
+            }
         }
     }
 
@@ -68,46 +99,6 @@ Window {
 
     SensorPanel {
         id: sensorPanel
-
-        Connections {
-            target: sensorController
-
-            function onSensorAdded(id, name, input, threshold, isTriggered, layer, x, y) {
-                if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
-                    sensorPanel.addSensorToGraph(name, input, threshold, isTriggered, x, y)
-                }
-            }
-
-            function onSensorUpdated(id, name, input, threshold, isTriggered, layer, x, y) {
-                if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
-                    sensorPanel.updateSensorOnGraph(name, input, threshold, isTriggered, x, y)
-                }
-            }
-
-            function onClearChartSeries() {
-                sensorPanel.clearSensorsOnGraph()
-            }
-        }
-
-        Connections {
-            target: vectorController
-
-            function onVectorAdded(id, name, rotation, scale, color, layer, x, y) {
-                if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
-                    sensorPanel.addVectorToGraph(name, rotation, scale, color, x, y)
-                }
-            }
-
-            function onVectorUpdated(id, name, rotation, scale, color, layer, x, y) {
-                if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
-                    sensorPanel.updateVectorOnGraph(name, rotation, scale, color, x, y)
-                }
-            }
-
-            function onClearChartSeries() {
-                sensorPanel.clearVectorsOnGraph()
-            }
-        }
     }
 
     TitleBar {
@@ -134,15 +125,6 @@ Window {
             appController.restoreToIndex(timelineBar.currentFrame)
             timelineBar.updateTimelineProps()
         }
-
-        Connections {
-            target: appController
-
-            function onSnapshotsChanged() {
-                timelineBar.updateTimelineProps();
-            }
-        }
-
 
         Connections {
             target: appController.portManager
