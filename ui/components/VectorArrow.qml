@@ -18,17 +18,14 @@ ScatterSeries {
 
     pointDelegate: Item {
         id: vectorItem
-        width: chart.width * 0.1
-        height: chart.height * 0.1
-        scale: vectorScale
+        width: chart.width * 0.1 * vectorScale
+        height: chart.height * 0.1 * vectorScale
 
         Image {
             id: vectorImage
             anchors.fill: parent
             source: "../../assets/SVG/arrow.svg"
-            width: parent.width
-            height: parent.height
-            sourceSize: Qt.size(width * 2, height * 2)
+            sourceSize: Qt.size(parent.width * 2, parent.height * 2)
             smooth: true
             visible: false
         }
