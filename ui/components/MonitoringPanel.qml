@@ -207,7 +207,6 @@ Flickable {
                 color: index % 2 === 0 ? "#1a1a1a" : "#151515"
 
                 sensorName: model.name
-                sensorID: model.id
                 inputValue: model.inputValue
                 thresholdValue: model.threshold
                 isTriggered: model.isTriggered
