@@ -351,7 +351,6 @@ Flickable {
                 color: index % 2 === 0 ? "#1a1a1a" : "#151515"
 
                 vectorName: model.name
-                vectorID: model.id
                 rotationValue: model.rotation
                 vectorColor: model.color
                 xLocation: model.x

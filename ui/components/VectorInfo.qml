@@ -5,7 +5,6 @@ import QtQuick.Layouts
 Rectangle {
     id: vectorInfo
     property string vectorName: "No Name Set"
-    property var vectorID: -1
     property double rotationValue: 1.0
     property double scale: 1.0
     property color vectorColor: "white"
@@ -33,6 +32,7 @@ Rectangle {
         acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
     }
 
+    // left accent bar, color could possible be used to signify something
     Rectangle {
         width: 6
         height: parent.height * 0.6
@@ -45,118 +45,65 @@ Rectangle {
         }
     }
 
-    GridLayout {
+    RowLayout {
         anchors.fill: parent
         anchors.margins: 8
-        columns: 3
-        rows: 1
+        spacing: 8
 
         // Column 1: Vector Name
-        Rectangle {
-            Layout.preferredWidth: parent.width * 0.3
+        Text {
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "transparent"
+            Layout.preferredWidth: 0
+            clip: true
+            elide: Text.ElideRight
 
-            TextField {
-                id: textInput
-                color: "white"
-                text: vectorName
-                font.bold: true
-                font.pixelSize: 14
-                anchors.centerIn: parent
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                selectByMouse: true
-                selectionColor: "#98FF98"
-                selectedTextColor: "#1a1a1a"
-
-                background: Rectangle {
-                    color: "transparent"
-                    border.color: textInput.hovered ? "#98FF98" : "transparent"
-                    border.width: 2
-                    radius: 4
-
-                    Behavior on border.color {
-                        ColorAnimation {
-                            duration: 150
-                        }
-                    }
-                }
-
-
-                onActiveFocusChanged: {
-                    if (activeFocus) {
-
-                        // Gained focus
-                    } else {
-                        if (text.trim() === "") {
-                            vectorName = "No vector name";
-                        } else {
-                            vectorName = text;
-                        }
-                        focus = false;
-                    }
-                }
-            }
+            color: "white"
+            text: vectorName
+            font.bold: true
+            font.pixelSize: 14
         }
 
         //column 2: (x,y)
-        Rectangle {
-            Layout.preferredWidth: parent.width * 0.1
+        Text {
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "transparent"
+            Layout.preferredWidth: 0
+            clip: true
+            elide: Text.ElideRight
 
-            Text {
-                color: "white"
-                font.bold: true
-                font.pixelSize: 14
-                anchors.centerIn: parent
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                text: "(" + xLocation + ", " + yLocation + ")"
-            }
+            color: "white"
+            font.bold: true
+            font.pixelSize: 14
+            text: "(%1, %2)".arg(xLocation).arg(yLocation)
         }
 
-        // Column 3: rotation | color
-        Rectangle {
-            Layout.preferredWidth: parent.width * 0.5
+        // Column 3: rotation
+        Text {
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "#1a1a1a"
+            Layout.preferredWidth: 0
+            clip: true
+            elide: Text.ElideRight
+
+            color: "white"
+            font.pixelSize: 14
+            text: "rotation: " + (((rotationValue % 360) + 540) % 360 - 180).toFixed(1)
+        }
+
+        // Column 4: Color
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: 0
             radius: 10
-
-            RowLayout {
-                anchors.fill: parent
-                spacing: 5
-
-                // rotation
-                Rectangle {
-                    Layout.preferredWidth: 20
-                    Layout.fillHeight: true
-                    color: "transparent"
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    Layout.fillWidth: true
-                    Text {
-                        anchors.centerIn: parent
-                        color: "white"
-                        text: "rotation: " + (((rotationValue % 360) + 540) % 360 - 180).toFixed(1)
-                        font.pixelSize: 14
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                }
-
-                // Color
-                Rectangle {
-                    id: vectorColor
-                    radius: 10
-                    Layout.preferredWidth: 20
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-
-                    color: vectorInfo.vectorColor
-                }
-            }
+            color: vectorColor
         }
-
     }
 }
