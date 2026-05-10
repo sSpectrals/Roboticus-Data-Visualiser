@@ -126,7 +126,7 @@ Window {
         portManager: appController.portManager
     }
 
-    MonitoringPanel {
+    Monitor {
         id: monitor
 
         sensorController: sensorController

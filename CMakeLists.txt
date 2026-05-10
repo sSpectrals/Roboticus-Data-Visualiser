@@ -28,18 +28,20 @@ qt_add_qml_module(appRoboticus_control_center
     QML_FILES
         "ui/Main.qml"
         "ui/components/Graph/Graph.qml"
-        "ui/components/SensorInfo.qml"
-
         "ui/components/Graph/SinglePointSeries.qml"
         "ui/components/Graph/VectorArrow.qml"
-        "ui/components/VectorInfo.qml"
-        "ui/components/MonitoringPanel.qml"
-        "ui/components/Error.qml"
-        "ui/components/ConnectionBar.qml"
+
+        "ui/components/Monitor/SensorInfo.qml"
+        "ui/components/Monitor/VectorInfo.qml"
+        "ui/components/Monitor/Monitor.qml"
+
         "ui/components/Timeline/Timeline.qml"
-        "ui/components/StyledComboBox.qml"
         "ui/components/Timeline/StyledIconButton.qml"
         "ui/components/Timeline/TimelineProgressBar.qml"
+
+        "ui/components/Error.qml"
+        "ui/components/ConnectionBar.qml"
+        "ui/components/StyledComboBox.qml"
 
 
     RESOURCES
@@ -55,7 +57,7 @@ qt_add_qml_module(appRoboticus_control_center
         "assets/SVG/upload.svg"
 
     SOURCES
-        # Controllers (Contain QML_ELEMENT)
+        # Controllers
         "include/controllers/AppController.h"
         "src/controllers/AppController.cpp"
         "include/controllers/SensorController.h"
@@ -84,6 +86,7 @@ qt_add_qml_module(appRoboticus_control_center
         "src/parser/SnapshotStore.cpp"
         "include/parser/SnapshotLoader.h"
         "src/parser/SnapshotLoader.cpp"
+        QML_FILES ui/components/Monitor/ItemListView.qml
 
 )
 
