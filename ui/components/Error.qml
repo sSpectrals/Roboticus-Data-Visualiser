@@ -4,6 +4,7 @@ import QtQuick.Layouts
 
 Popup {
     id: root
+
     width: Math.min(420, parent.width - 60)
     height: contentLayout.implicitHeight + 30
     x: parent.width - width - 30
@@ -16,14 +17,14 @@ Popup {
     property int displayDuration: 3000
 
     function show(message) {
-        errorMessage = message;
-        root.open();
-        autoDismissTimer.restart();
+        errorMessage = message
+        root.open()
+        autoDismissTimer.restart()
     }
 
     function dismiss() {
-        autoDismissTimer.stop();
-        root.close();
+        autoDismissTimer.stop()
+        root.close()
     }
 
     Timer {
@@ -35,17 +36,16 @@ Popup {
     enter: Transition {
         NumberAnimation {
             property: "opacity"
-            from: 0.0
-            to: 1.0
+            from: 0.0; to: 1.0
             duration: 250
             easing.type: Easing.InOutQuad
         }
     }
+
     exit: Transition {
         NumberAnimation {
             property: "opacity"
-            from: 1.0
-            to: 0.0
+            from: 1.0; to: 0.0
             duration: 250
             easing.type: Easing.InOutQuad
         }
@@ -73,8 +73,8 @@ Popup {
 
     contentItem: RowLayout {
         id: contentLayout
-        anchors.fill: parent
         anchors {
+            fill: parent
             leftMargin: 24
             rightMargin: 12
             topMargin: 12
@@ -108,33 +108,30 @@ Popup {
             Layout.preferredHeight: 28
             Layout.alignment: Qt.AlignTop
             radius: 6
-            color: "transparent"
+            color: closeHover.hovered ? "#2a1a1a" : "transparent"
 
             Behavior on color {
-                ColorAnimation {
-                    duration: 150
-                }
+                ColorAnimation { duration: 150 }
             }
 
             Text {
                 anchors.centerIn: parent
                 text: "\u2715"
                 font.pixelSize: 14
-                color: closeArea.containsMouse ? "#FF6B6B" : "#888888"
+                color: closeHover.hovered ? "#FF6B6B" : "#888888"
 
                 Behavior on color {
-                    ColorAnimation {
-                        duration: 150
-                    }
+                    ColorAnimation { duration: 150 }
                 }
             }
 
-            MouseArea {
-                id: closeArea
-                anchors.fill: parent
-                hoverEnabled: true
+            HoverHandler {
+                id: closeHover
+            }
+
+            TapHandler {
                 cursorShape: Qt.PointingHandCursor
-                onClicked: root.dismiss()
+                onTapped: root.dismiss()
             }
         }
     }
