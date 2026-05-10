@@ -29,6 +29,25 @@ Window {
         }
     }
 
+    Connections {
+        target: appController.portManager
+
+        function onConnectionChanged() {
+            if (appController.portManager.isConnected) {
+                sensorController.setActiveLayer(monitor.selectedSensorLayer)
+                vectorController.setActiveLayer(monitor.selectedVectorLayer)
+                timelineBar.currentFrame = 0;
+            } else {
+                // timelineBar.currentFrame = timelineBar.maxFrames;
+            }
+        }
+
+        // if performance tanks then maybe don't update ui on every read but instead on disconnect
+        function onRawDataReceived() {
+            timelineBar.currentFrame = timelineBar.maxFrames
+        }
+    }
+
     SensorController {
         id: sensorController
 
@@ -117,24 +136,12 @@ Window {
     Timeline {
         id: timelineBar
 
-
         appController: appController
 
         onCurrentFrameChanged: {
             sensorPanel.clearGraph()
             appController.restoreToIndex(timelineBar.currentFrame)
             timelineBar.updateTimelineProps()
-        }
-
-        Connections {
-            target: appController.portManager
-
-            function onConnectionChanged() {
-                if (appController.portManager.isConnected) {
-                    sensorController.setActiveLayer(monitor.selectedSensorLayer)
-                    vectorController.setActiveLayer(monitor.selectedVectorLayer)
-                }
-            }
         }
     }
 

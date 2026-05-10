@@ -36,7 +36,10 @@ qt_add_qml_module(appRoboticus_control_center
         "ui/components/MonitoringPanel.qml"
         "ui/components/Error.qml"
         "ui/components/ConnectionBar.qml"
-        "ui/components/Timeline.qml"
+        "ui/components/Timeline/Timeline.qml"
+        "ui/components/StyledComboBox.qml"
+        "ui/components/Timeline/StyledIconButton.qml"
+        "ui/components/Timeline/TimelineProgressBar.qml"
 
 
     RESOURCES
@@ -81,7 +84,7 @@ qt_add_qml_module(appRoboticus_control_center
         "src/parser/SnapshotStore.cpp"
         "include/parser/SnapshotLoader.h"
         "src/parser/SnapshotLoader.cpp"
-        QML_FILES ui/components/StyledComboBox.qml
+
 )
 
 # 5. Include Directories

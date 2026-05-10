@@ -155,8 +155,6 @@ bool AppController::restoreToIndex(int index) {
   if (!m_snapshotStore.isValidIndex(index))
     return false;
 
-  m_portManager->disconnectPort();
-
   const FrameSnapshot snapshot = m_snapshotStore.at(index);
 
   if (m_sensorModel) {
