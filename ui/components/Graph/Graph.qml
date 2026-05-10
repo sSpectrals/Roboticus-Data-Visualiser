@@ -30,17 +30,19 @@ Rectangle {
             margins: 20
         }
 
-        axisX: axisX
-        axisY: axisY
-
         theme: GraphsTheme {
+            colorScheme: GraphsTheme.ColorScheme.Dark
+            labelBackgroundVisible: false
             labelBorderVisible: false
             grid {
-                mainColor: "grey"
+                mainColor: "#333333"   // major grid lines
                 mainWidth: 2
             }
             gridVisible: true
         }
+
+        axisX: axisX
+        axisY: axisY
 
         ValueAxis {
             id: axisX
@@ -61,12 +63,8 @@ Rectangle {
             acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
 
             onWheel: function (event) {
-                let delta = event.angleDelta.y
-                let zoomFactor = delta > 0 ? 1.1 : 0.9
-
-                axisX.zoom *= zoomFactor
-
-                axisX.zoom = Math.max(0.5, Math.min(4, axisX.zoom))
+                let zoomFactor = event.angleDelta.y > 0 ? 1.1 : 0.9
+                axisX.zoom = Math.max(0.5, Math.min(4, axisX.zoom * zoomFactor))
             }
         }
 
