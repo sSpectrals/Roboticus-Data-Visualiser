@@ -53,7 +53,7 @@ Window {
 
 
         onClearChartSeries: function () {
-            sensorPanel.clearSensorsOnGraph();
+            graph.clearSensorsOnGraph();
         }
 
         onErrorOccurred: function (message) {
@@ -64,13 +64,13 @@ Window {
 
         onSensorAdded: function(id, name, input, threshold, isTriggered, layer, x, y) {
             if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
-                sensorPanel.addSensorToGraph(name, input, threshold, isTriggered, x, y)
+                graph.addSensorToGraph(name, input, threshold, isTriggered, x, y)
             }
         }
 
         onSensorUpdated: function(id, name, input, threshold, isTriggered, layer, x, y) {
             if (layer.toLowerCase() === monitor.selectedSensorLayer.toLowerCase()) {
-                sensorPanel.updateSensorOnGraph(name, input, threshold, isTriggered, x, y)
+                graph.updateSensorOnGraph(name, input, threshold, isTriggered, x, y)
             }
         }
     }
@@ -79,7 +79,7 @@ Window {
         id: vectorController
 
         onClearChartSeries: function () {
-            sensorPanel.clearVectorsOnGraph();
+            graph.clearVectorsOnGraph();
         }
 
         onErrorOccurred: function (message) {
@@ -89,13 +89,13 @@ Window {
 
         onVectorAdded: function(id, name, rotation, scale, color, layer, x, y) {
             if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
-                sensorPanel.addVectorToGraph(name, rotation, scale, color, x, y)
+                graph.addVectorToGraph(name, rotation, scale, color, x, y)
             }
         }
 
         onVectorUpdated: function(id, name, rotation, scale, color, layer, x, y) {
             if (layer.toLowerCase() === monitor.selectedVectorLayer.toLowerCase()) {
-                sensorPanel.updateVectorOnGraph(name, rotation, scale, color, x, y)
+                graph.updateVectorOnGraph(name, rotation, scale, color, x, y)
             }
         }
     }
@@ -116,8 +116,8 @@ Window {
         opacity: 0.8
     }
 
-    SensorPanel {
-        id: sensorPanel
+    Graph {
+        id: graph
     }
 
     ConnectionBar {
@@ -139,7 +139,7 @@ Window {
         appController: appController
 
         onCurrentFrameChanged: {
-            sensorPanel.clearGraph()
+            graph.clearGraph()
             appController.restoreToIndex(timelineBar.currentFrame)
             timelineBar.updateTimelineProps()
         }

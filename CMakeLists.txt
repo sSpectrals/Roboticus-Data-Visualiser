@@ -27,11 +27,11 @@ qt_add_qml_module(appRoboticus_control_center
     # Virtual paths in QRC will match these relative paths
     QML_FILES
         "ui/Main.qml"
-        "ui/components/SensorPanel.qml"
+        "ui/components/Graph/Graph.qml"
         "ui/components/SensorInfo.qml"
 
-        "ui/components/SinglePointSeries.qml"
-        "ui/components/VectorArrow.qml"
+        "ui/components/Graph/SinglePointSeries.qml"
+        "ui/components/Graph/VectorArrow.qml"
         "ui/components/VectorInfo.qml"
         "ui/components/MonitoringPanel.qml"
         "ui/components/Error.qml"

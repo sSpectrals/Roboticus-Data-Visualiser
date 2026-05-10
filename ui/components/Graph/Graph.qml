@@ -2,7 +2,7 @@ import QtQuick
 import QtGraphs
 
 Rectangle {
-    id: sensorPanel
+    id: root
     width: parent.width / 2
     height: monitor.height
     color: "#1a1a1a"
