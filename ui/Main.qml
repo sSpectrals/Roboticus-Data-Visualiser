@@ -101,7 +101,7 @@ Window {
         id: sensorPanel
     }
 
-    TitleBar {
+    ConnectionBar {
         id: title
 
         portManager: appController.portManager
