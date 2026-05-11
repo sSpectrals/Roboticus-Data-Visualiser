@@ -1,5 +1,6 @@
 #include "parser/SerialFrameExtractor.h"
 
+
 void SerialFrameExtractor::appendData(const QByteArray &chunk)
 {
     m_buffer.append(chunk);
@@ -15,6 +16,7 @@ void SerialFrameExtractor::appendData(const QByteArray &chunk)
         }
     }
 }
+
 
 QList<QByteArray> SerialFrameExtractor::takeCompleteFrames()
 {

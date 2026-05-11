@@ -2,13 +2,17 @@
 
 SnapshotStore::SnapshotStore(QObject *parent) : QObject(parent) {}
 
+
 void SnapshotStore::clear() { m_snapshots.clear(); }
+
 
 void SnapshotStore::append(const FrameSnapshot &snapshot) {
   m_snapshots.append(snapshot);
 }
 
+
 int SnapshotStore::count() const { return m_snapshots.size(); }
+
 
 qint64 SnapshotStore::timestampAt(int index) const {
   if (!isValidIndex(index)) {
@@ -16,6 +20,7 @@ qint64 SnapshotStore::timestampAt(int index) const {
   }
   return m_snapshots.at(index).timestamp;
 }
+
 
 QList<qint64> SnapshotStore::availableTimestamps() const {
   QList<qint64> result;
@@ -26,9 +31,11 @@ QList<qint64> SnapshotStore::availableTimestamps() const {
   return result;
 }
 
+
 bool SnapshotStore::isValidIndex(int index) const {
   return index >= 0 && index < m_snapshots.size();
 }
+
 
 FrameSnapshot SnapshotStore::at(int index) const {
   if (!isValidIndex(index)) {
@@ -36,5 +43,6 @@ FrameSnapshot SnapshotStore::at(int index) const {
   }
   return m_snapshots.at(index);
 }
+
 
 QList<FrameSnapshot> SnapshotStore::all() const { return m_snapshots; }

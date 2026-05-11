@@ -9,9 +9,25 @@ class SnapshotLoader : public QObject {
 public:
   explicit SnapshotLoader(QObject *parent = nullptr);
 
-  bool save(const QUrl &filePath, const QList<FrameSnapshot> &snapshots,
+    /**
+     * @brief Serializes a list of snapshots to a compact JSON file.
+     * @param filePath   Destination file path as a QUrl.
+     * @param snapshots  The snapshots to serialize.
+     * @param errorMessage Optional output string populated on failure.
+     * @return True on success, false on any file or write error.
+     */
+    bool save(const QUrl &filePath, const QList<FrameSnapshot> &snapshots,
             QString *errorMessage = nullptr) const;
-  bool load(const QUrl &filePath, QList<FrameSnapshot> *snapshots,
+
+
+    /**
+     * @brief Deserializes a list of snapshots from a JSON file.
+     * @param filePath     Source file path as a QUrl.
+     * @param snapshots    Output list populated on success.
+     * @param errorMessage Optional output string populated on failure.
+     * @return True on success, false on any file, parse, or format error.
+     */
+    bool load(const QUrl &filePath, QList<FrameSnapshot> *snapshots,
             QString *errorMessage = nullptr) const;
 };
 

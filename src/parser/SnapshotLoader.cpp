@@ -7,6 +7,7 @@
 
 SnapshotLoader::SnapshotLoader(QObject *parent) : QObject(parent) {}
 
+
 bool SnapshotLoader::save(const QUrl &filePath,
                           const QList<FrameSnapshot> &snapshots,
                           QString *errorMessage) const {
@@ -80,6 +81,7 @@ bool SnapshotLoader::save(const QUrl &filePath,
   }
   return true;
 }
+
 
 bool SnapshotLoader::load(const QUrl &filePath, QList<FrameSnapshot> *snapshots,
                           QString *errorMessage) const {
