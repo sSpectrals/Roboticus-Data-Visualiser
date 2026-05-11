@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls 2.15
 import QtQuick.Layouts
-import com.Roboticus.ControlCenter
+import com.Roboticus.DataVisualiser
 import QtQuick.Controls.Material
 
 Rectangle {

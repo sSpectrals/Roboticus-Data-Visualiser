@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("com.Roboticus.ControlCenter", "Main");
+    engine.loadFromModule("com.Roboticus.DataVisualiser", "Main");
 
     return app.exec();
 }

@@ -2,14 +2,14 @@ import QtQuick
 import "./components"
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material
-import com.Roboticus.ControlCenter
+import com.Roboticus.DataVisualiser
 
 Window {
     id: window
     visibility: Window.Maximized
     minimumWidth: 950
     minimumHeight: 480
-    title: "Roboticus Control Center"
+    title: "Roboticus Data Visualiser"
     color: "#1a1a1a"
 
     Material.theme: Material.Dark
