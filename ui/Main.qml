@@ -38,13 +38,8 @@ Window {
                 vectorController.setActiveLayer(monitor.selectedVectorLayer)
                 timelineBar.currentFrame = 0;
             } else {
-                // timelineBar.currentFrame = timelineBar.maxFrames;
+                timelineBar.currentFrame = timelineBar.maxFrames;
             }
-        }
-
-        // if performance tanks then maybe don't update ui on every read but instead on disconnect
-        function onRawDataReceived() {
-            timelineBar.currentFrame = timelineBar.maxFrames
         }
     }
 
