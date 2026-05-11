@@ -28,6 +28,8 @@ endif()
 
 add_library(qmsgpack ${COMPILE_TYPE} ${qmsgpack_srcs} ${qmsgpack_headers})
 
+target_compile_definitions(qmsgpack PUBLIC MSGPACK_STATIC)
+
 # Link against the libraries we found in the parent CMake (Qt6 or Qt5)
 target_link_libraries(qmsgpack PUBLIC ${QT_LIBRARIES})
 

@@ -34,6 +34,7 @@ Thumbs.db
 *.rc
 /.qmake.cache
 /.qmake.stash
+.qmlls.ini
 
 # qtcreator generated files
 *.pro.user*
@@ -60,7 +61,6 @@ CMakeLists.txt.user*
 *.opensdf
 *.vcxproj
 *vcxproj.*
-*.cache
 
 # MinGW generated files
 *.Debug
@@ -80,4 +80,5 @@ CMakeLists.txt.user*
 .pch/
 .rcc/
 .uic/
+.cache/
 /build*/
