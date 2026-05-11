@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Roboticus_control_center VERSION 0.1 LANGUAGES CXX)
+project(Roboticus_Data_Visualiser VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -18,15 +18,15 @@ if(WIN32)
     set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/app.rc")
 endif()
 
-qt_add_executable(appRoboticus_control_center
+qt_add_executable(appRoboticus_Data_Visualiser
     "src/main.cpp"
     ${app_icon_resource_windows}
 )
 
 # 4. Define the QML Module
 # This combines the logic and UI into one importable URI.
-qt_add_qml_module(appRoboticus_control_center
-    URI com.Roboticus.ControlCenter
+qt_add_qml_module(appRoboticus_Data_Visualiser
+    URI com.Roboticus.DataVisualiser
     VERSION 1.0
 
     # Virtual paths in QRC will match these relative paths
@@ -102,7 +102,7 @@ qt_add_qml_module(appRoboticus_control_center
 
 # 5. Include Directories
 # This allows you to use #include "io/SerialParser.h" instead of relative paths
-target_include_directories(appRoboticus_control_center PRIVATE
+target_include_directories(appRoboticus_Data_Visualiser PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/controllers"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/models"
@@ -112,7 +112,7 @@ target_include_directories(appRoboticus_control_center PRIVATE
 )
 
 # 6. Link Libraries
-target_link_libraries(appRoboticus_control_center
+target_link_libraries(appRoboticus_Data_Visualiser
     PRIVATE
         Qt6::Quick
         Qt6::Graphs
@@ -122,7 +122,7 @@ target_link_libraries(appRoboticus_control_center
 )
 
 # 7. OS Specific Configuration
-set_target_properties(appRoboticus_control_center PROPERTIES
+set_target_properties(appRoboticus_Data_Visualiser PROPERTIES
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
@@ -142,7 +142,7 @@ endif()
 
 # 8. Installation
 include(GNUInstallDirs)
-install(TARGETS appRoboticus_control_center
+install(TARGETS appRoboticus_Data_Visualiser
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
