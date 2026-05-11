@@ -14,8 +14,13 @@ qt_standard_project_setup(REQUIRES 6.11)
 add_subdirectory(libs/qmsgpack)
 
 # 3. Define the Main Executable
+if(WIN32)
+    set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/app.rc")
+endif()
+
 qt_add_executable(appRoboticus_control_center
     "src/main.cpp"
+    ${app_icon_resource_windows}
 )
 
 # 4. Define the QML Module
@@ -34,6 +39,7 @@ qt_add_qml_module(appRoboticus_control_center
         "ui/components/Monitor/SensorInfo.qml"
         "ui/components/Monitor/VectorInfo.qml"
         "ui/components/Monitor/Monitor.qml"
+        "ui/components/Monitor/ItemListView.qml"
 
         "ui/components/Timeline/Timeline.qml"
         "ui/components/Timeline/StyledIconButton.qml"
@@ -55,6 +61,11 @@ qt_add_qml_module(appRoboticus_control_center
         "assets/SVG/arrow_right_grey.svg"
         "assets/SVG/download.svg"
         "assets/SVG/upload.svg"
+
+        "assets/Icons/apple-touch-icon.png"
+        "assets/Icons/favicon.ico"
+        "assets/Icons/favicon.svg"
+        "assets/Icons/favicon-96x96.png"
 
     SOURCES
         # Controllers
@@ -86,7 +97,6 @@ qt_add_qml_module(appRoboticus_control_center
         "src/parser/SnapshotStore.cpp"
         "include/parser/SnapshotLoader.h"
         "src/parser/SnapshotLoader.cpp"
-        QML_FILES ui/components/Monitor/ItemListView.qml
 
 )
 
@@ -118,6 +128,17 @@ set_target_properties(appRoboticus_control_center PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+
+if(UNIX AND NOT APPLE)
+    install(FILES assets/Icons/favicon-96x96.png
+            DESTINATION share/icons/hicolor/96x96/apps
+            RENAME com.roboticus.controlcenter.png)
+    install(FILES assets/Icons/favicon.svg
+            DESTINATION share/icons/hicolor/scalable/apps
+            RENAME com.roboticus.controlcenter.svg)
+    install(FILES com.Roboticus.ControlCenter.desktop
+            DESTINATION share/applications)
+endif()
 
 # 8. Installation
 include(GNUInstallDirs)

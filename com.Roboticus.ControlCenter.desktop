@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Roboticus Control Center
+Comment=Roboticus Control Center
+Exec=appRoboticus_control_center
+Icon=com.roboticus.controlcenter
+Type=Application
+Categories=Utility;
