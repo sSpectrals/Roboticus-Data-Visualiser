@@ -4,6 +4,7 @@
 #include <QVariant>
 #include <QUuid>
 
+
 template <typename ModelT, typename ErrorEmitterT>
 bool setModelValueById(ModelT *model, const QUuid &id, const QVariant &value,
                        int role, ErrorEmitterT emitError, const QString &fieldName,

@@ -1,5 +1,4 @@
-#ifndef APPCONTROLLER_H
-#define APPCONTROLLER_H
+#pragma once
 
 #include <QObject>
 #include <QQmlEngine>
@@ -13,58 +12,116 @@
 #include "include/parser/SnapshotLoader.h"
 #include "include/parser/SnapshotStore.h"
 
+/**
+ * @brief Central controller that wires together the serial port, parser,
+ *        data models, snapshot store, and file I/O.
+ *
+ *        Owns the SerialPortManager and SerialParser. Holds weak (non-owning)
+ *        pointers to the SensorModel and VectorModel, which are set after
+ *        construction via setModels().
+ */
 class AppController : public QObject {
-  Q_OBJECT
-  QML_ELEMENT
+    Q_OBJECT
+    QML_ELEMENT
 
-  // Expose the managers so QML can bind to their properties (e.g., isConnected)
-  Q_PROPERTY(SerialPortManager *portManager READ portManager CONSTANT)
-  Q_PROPERTY(SerialParser *parser READ parser CONSTANT)
-  Q_PROPERTY(int snapshotCount READ snapshotCount NOTIFY snapshotsChanged)
+    /** @brief Exposes the port manager to QML so bindings like isConnected work. */
+    Q_PROPERTY(SerialPortManager *portManager READ portManager CONSTANT)
+
+    /** @brief Exposes the parser to QML. */
+    Q_PROPERTY(SerialParser *parser READ parser CONSTANT)
+
+    /** @brief Total number of stored snapshots; updates whenever a frame arrives or a file is loaded. */
+    Q_PROPERTY(int snapshotCount READ snapshotCount NOTIFY snapshotsChanged)
 
 public:
-  explicit AppController(QObject *parent = nullptr);
+    explicit AppController(QObject *parent = nullptr);
 
-  // Getters for QML
-  SerialPortManager *portManager() const { return m_portManager; }
-  SerialParser *parser() const { return m_parser; }
-  int snapshotCount() const { return m_snapshotStore.count(); }
+    SerialPortManager *portManager() const { return m_portManager; }
+    SerialParser *parser() const { return m_parser; }
+    int snapshotCount() const { return m_snapshotStore.count(); }
 
-  // Initialization
-  Q_INVOKABLE void setModels(SensorModel *sensorModel,
-                             VectorModel *vectorModel);
+    /**
+     * @brief Registers the active sensor and vector models with the controller.
+     *        Must be called before any frames are processed.
+     *        Does not take ownership of the models.
+     */
+    Q_INVOKABLE void setModels(SensorModel *sensorModel, VectorModel *vectorModel);
 
-  Q_INVOKABLE bool saveToFile(QUrl filePath);
-  Q_INVOKABLE bool loadFromFile(QUrl filePath);
+    /**
+     * @brief Serializes all stored snapshots to a JSON file.
+     * @param filePath Destination file as a QUrl.
+     * @return True on success; emits errorOccurred on failure.
+     */
+    Q_INVOKABLE bool saveToFile(QUrl filePath);
 
-  // Business Logic - Timeline
-  Q_INVOKABLE bool restoreToIndex(int index);
-  Q_INVOKABLE qint64 timestampAt(int index) const;
-  Q_INVOKABLE QList<qint64> availableTimestamps() const;
+    /**
+     * @brief Loads snapshots from a JSON file, replacing any existing store.
+     * @param filePath Source file as a QUrl.
+     * @return True on success; emits errorOccurred on failure.
+     */
+    Q_INVOKABLE bool loadFromFile(QUrl filePath);
+
+    /**
+     * @brief Restores the sensor and vector models to the state captured at
+     *        the given snapshot index.
+     * @param index Zero-based index into the snapshot store.
+     * @return True if the index was valid and models were restored.
+     */
+    Q_INVOKABLE bool restoreToIndex(int index);
+
+    /**
+     * @brief Returns the timestamp of the snapshot at the given index.
+     * @return Timestamp in milliseconds, or -1 if out of range.
+     */
+    Q_INVOKABLE qint64 timestampAt(int index) const;
+
+    /** @brief Returns all stored timestamps in order of arrival. */
+    Q_INVOKABLE QList<qint64> availableTimestamps() const;
 
 signals:
-  void snapshotsChanged();
-  void errorOccurred(const QString &message);
+    /** @brief Emitted whenever the snapshot store changes (frame received or file loaded). */
+    void snapshotsChanged();
+
+    /** @brief Emitted with a human-readable message when any operation fails. */
+    void errorOccurred(const QString &message);
 
 private slots:
-  void onFrameParsed(const DecodedFrame &frame);
-  void onPortConnectionChanged();
+    /**
+     * @brief Receives a decoded frame from the parser, updates the models,
+     *        and appends a snapshot to the store.
+     */
+    void onFrameParsed(const DecodedFrame &frame);
+
+    /** @brief Clears the snapshot store when a new port connection is established. */
+    void onPortConnectionChanged();
 
 private:
-  // Members
-  SerialPortManager *m_portManager = nullptr;
-  SerialParser *m_parser = nullptr;
-  SnapshotStore m_snapshotStore;
-  SnapshotLoader m_snapshotLoader;
+    SerialPortManager *m_portManager = nullptr;
+    SerialParser *m_parser = nullptr;
+    SnapshotStore m_snapshotStore;
+    SnapshotLoader m_snapshotLoader;
 
-  // UI Models (Weak references)
-  SensorModel *m_sensorModel = nullptr;
-  VectorModel *m_vectorModel = nullptr;
+    // Non-owning pointers; lifetime managed by the QML engine
+    SensorModel *m_sensorModel = nullptr;
+    VectorModel *m_vectorModel = nullptr;
 
-  void updateModelsFromFrame(const DecodedFrame &frame);
-  void updateSensorsFromFrame(const QVariantList &sensors);
-  void updateVectorsFromFrame(const QVariantList &vectors);
-  double roundTo2Decimals(float val) { return qRound(val * 100) / 100.0; }
+    /** @brief Dispatches frame data to the sensor and vector model updaters. */
+    void updateModelsFromFrame(const DecodedFrame &frame);
+
+    /**
+     * @brief Parses the raw sensor list from a frame and updates or inserts
+     *        entries in the sensor model.
+     *        Expected element order: [name, input, isTriggered, threshold, layer, x, y]
+     */
+    void updateSensorsFromFrame(const QVariantList &sensors);
+
+    /**
+     * @brief Parses the raw vector list from a frame and updates or inserts
+     *        entries in the vector model.
+     *        Expected element order: [name, rotation, color, layer, x, y]
+     */
+    void updateVectorsFromFrame(const QVariantList &vectors);
+
+    /** @brief Rounds a float to 2 decimal places to reduce noise in incoming data. */
+    double roundTo2Decimals(float val) { return qRound(val * 100) / 100.0; }
 };
-
-#endif // APPCONTROLLER_H
