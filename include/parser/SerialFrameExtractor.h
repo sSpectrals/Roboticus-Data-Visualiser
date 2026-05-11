@@ -1,5 +1,4 @@
-#ifndef SERIALFRAMEEXTRACTOR_H
-#define SERIALFRAMEEXTRACTOR_H
+#pragma once
 
 #include <QByteArray>
 #include <QList>
@@ -28,4 +27,3 @@ private:
     QByteArray m_buffer;
 };
 
-#endif // SERIALFRAMEEXTRACTOR_H

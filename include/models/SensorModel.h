@@ -1,5 +1,4 @@
-#ifndef SENSORMODEL_H
-#define SENSORMODEL_H
+#pragma once
 
 #include <QAbstractListModel>
 #include <QQmlEngine>
@@ -145,5 +144,3 @@ private:
     QList<Sensor> m_sensors;
     QList<QString> m_layers;
 };
-
-#endif // SENSORMODEL_H

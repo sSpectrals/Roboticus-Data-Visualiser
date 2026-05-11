@@ -1,5 +1,4 @@
-#ifndef FRAMETYPES_H
-#define FRAMETYPES_H
+#pragma once
 
 #include <QList>
 #include <QVariantList>
@@ -20,5 +19,3 @@ struct DecodedFrame {
   qint64 timestamp = 0;
   bool isValid = false;
 };
-
-#endif // FRAMETYPES_H

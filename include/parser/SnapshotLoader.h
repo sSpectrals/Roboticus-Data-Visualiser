@@ -1,5 +1,4 @@
-#ifndef SNAPSHOTLOADER_H
-#define SNAPSHOTLOADER_H
+#pragma once
 
 #include "FrameTypes.h"
 
@@ -30,5 +29,3 @@ public:
     bool load(const QUrl &filePath, QList<FrameSnapshot> *snapshots,
             QString *errorMessage = nullptr) const;
 };
-
-#endif // SNAPSHOTLOADER_H

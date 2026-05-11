@@ -1,5 +1,4 @@
-#ifndef SNAPSHOTSTORE_H
-#define SNAPSHOTSTORE_H
+#pragma once
 
 #include "FrameTypes.h"
 
@@ -58,4 +57,3 @@ private:
   QList<FrameSnapshot> m_snapshots;
 };
 
-#endif // SNAPSHOTSTORE_H

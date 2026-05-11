@@ -1,5 +1,4 @@
-#ifndef VECTORMODEL_H
-#define VECTORMODEL_H
+#pragma once
 
 #include <QAbstractListModel>
 #include <QColor>
@@ -146,5 +145,3 @@ private:
     QList<Vector> m_vectors;
     QList<QString> m_layers;
 };
-
-#endif // VECTORMODEL_H
