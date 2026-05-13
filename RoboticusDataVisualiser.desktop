@@ -2,6 +2,6 @@
 Name=Roboticus Data Visualiser
 Comment=Roboticus Data Visualiser
 Exec=appRoboticus_Data_Visualiser
-Icon=com.roboticus.datavisualiser
+Icon=icon
 Type=Application
 Categories=Utility;
