@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls 2.15
 import QtQuick.Layouts
-import com.Roboticus.DataVisualiser
+import com.roboticus.datavisualiser
 import QtQuick.Controls.Material
 
 Rectangle {
@@ -67,8 +67,8 @@ Rectangle {
             Layout.preferredWidth: 110
             Layout.preferredHeight: connectionBar.height * 0.6
             Layout.fillWidth: true
-            model: [38400, 57600, 115200, 230400, 460800, 921600]
-            currentIndex: 2
+            model: [9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600]
+            currentIndex: 4
 
             onActivated: (index) => {
                 portManager.setBaudRate(model[index])

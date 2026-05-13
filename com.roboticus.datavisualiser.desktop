@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Roboticus Data Visualiser
+Comment=Data visualisation for microcontrollers
+Exec=appRoboticus_Data_Visualiser
+Icon=icon
+StartupWMClass=Roboticus-Data-Visualiser
+Categories=Development;
+Terminal=false
+StartupNotify=true
+Keywords=data;visualisation;roboticus;sensors;vectors;graphs;
+MimeType=application/x-roboticus-data;
+X-AppImage-Name=Roboticus Data Visualiser
+X-AppImage-Version=1.0.0

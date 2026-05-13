@@ -26,7 +26,7 @@ qt_add_executable(appRoboticus_Data_Visualiser
 # 4. Define the QML Module
 # This combines the logic and UI into one importable URI.
 qt_add_qml_module(appRoboticus_Data_Visualiser
-    URI com.Roboticus.DataVisualiser
+    URI com.roboticus.datavisualiser
     VERSION 1.0
 
     # Virtual paths in QRC will match these relative paths
@@ -101,7 +101,6 @@ qt_add_qml_module(appRoboticus_Data_Visualiser
 )
 
 # 5. Include Directories
-# This allows you to use #include "io/SerialParser.h" instead of relative paths
 target_include_directories(appRoboticus_Data_Visualiser PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/controllers"
@@ -130,13 +129,13 @@ set_target_properties(appRoboticus_Data_Visualiser PROPERTIES
 )
 
 if(UNIX AND NOT APPLE)
-    install(FILES assets/Icons/favicon-96x96.png
+    install(FILES assets/Icons/icon.png
             DESTINATION share/icons/hicolor/96x96/apps
-            RENAME com.roboticus.controlcenter.png)
-    install(FILES assets/Icons/favicon.svg
+            RENAME com.roboticus.datavisualiser.png)
+    install(FILES assets/Icons/icon.svg
             DESTINATION share/icons/hicolor/scalable/apps
-            RENAME com.roboticus.controlcenter.svg)
-    install(FILES com.Roboticus.ControlCenter.desktop
+            RENAME com.roboticus.datavisualiser.svg)
+    install(FILES com.roboticus.datavisualiser.desktop
             DESTINATION share/applications)
 endif()
 
