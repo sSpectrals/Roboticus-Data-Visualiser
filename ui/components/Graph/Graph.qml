@@ -46,8 +46,8 @@ Rectangle {
 
         ValueAxis {
             id: axisX
-            min: -20
-            max: 20
+            min: -25
+            max: 25
             zoom: 1.0
         }
 
