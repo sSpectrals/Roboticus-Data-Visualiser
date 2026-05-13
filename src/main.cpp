@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
-    app.setWindowIcon(QIcon(":/com/Roboticus/ControlCenter/assets/Icons/favicon-96x96.png"));
+    app.setWindowIcon(QIcon(":/com/Roboticus/ControlCenter/assets/Icons/icon.png"));
 
     QQmlApplicationEngine engine;
 

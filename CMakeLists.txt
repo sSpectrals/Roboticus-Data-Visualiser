@@ -63,9 +63,9 @@ qt_add_qml_module(appRoboticus_Data_Visualiser
         "assets/SVG/upload.svg"
 
         "assets/Icons/apple-touch-icon.png"
-        "assets/Icons/favicon.ico"
-        "assets/Icons/favicon.svg"
-        "assets/Icons/favicon-96x96.png"
+        "assets/Icons/icon.ico"
+        "assets/Icons/icon.svg"
+        "assets/Icons/icon.png"
 
     SOURCES
         # Controllers
