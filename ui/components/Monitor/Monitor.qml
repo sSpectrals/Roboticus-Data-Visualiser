@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQml.Models
-import com.roboticus.datavisualiser
+import com.roboticus.DataVisualiser
 
 Flickable {
     id: flickable

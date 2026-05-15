@@ -26,7 +26,7 @@ qt_add_executable(appRoboticus_Data_Visualiser
 # 4. Define the QML Module
 # This combines the logic and UI into one importable URI.
 qt_add_qml_module(appRoboticus_Data_Visualiser
-    URI com.roboticus.datavisualiser
+    URI com.roboticus.DataVisualiser
     VERSION 1.0
 
     # Virtual paths in QRC will match these relative paths
@@ -127,6 +127,21 @@ set_target_properties(appRoboticus_Data_Visualiser PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+if(UNIX AND NOT APPLE)
+    install(FILES assets/Icons/com.roboticus.DataVisualiser.png
+            DESTINATION share/icons/hicolor/256x256/apps
+            RENAME com.roboticus.DataVisualiser.png)
+
+    install(FILES assets/Icons/com.roboticus.DataVisualiser.svg
+            DESTINATION share/icons/hicolor/scalable/apps
+            RENAME com.roboticus.DataVisualiser.svg)
+
+    install(FILES com.roboticus.DataVisualiser.desktop
+            DESTINATION share/applications)
+
+    install(FILES com.roboticus.DataVisualiser.metainfo.xml
+            DESTINATION share/metainfo)
+endif()
 
 # 8. Installation
 include(GNUInstallDirs)

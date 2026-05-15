@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Layouts
 import QtQuick.Dialogs
-import com.roboticus.datavisualiser
+import com.roboticus.DataVisualiser
 
 Rectangle {
     id: timeline

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>com.roboticus.DataVisualiser</id>
+    <name>Roboticus Data Visualiser</name>
+    <summary>Data visualisation for microcontrollers</summary>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-3.0</project_license>
+    <description>
+        <p>Data visualisation tool for microcontroller sensors and vectors.</p>
+    </description>
+    <launchable type="desktop-id">com.roboticus.DataVisualiser.desktop</launchable>
+    <icon type="stock">com.roboticus.DataVisualiser</icon>
+    <categories>
+        <category>Development</category>
+    </categories>
+    <url type="homepage">https://github.com/sSpectrals/Roboticus-Data-Visualiser</url>
+    <releases>
+        <release version="1.0.0" date="2026-05-18"/>
+    </releases>
+</component>

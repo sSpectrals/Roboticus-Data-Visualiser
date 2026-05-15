@@ -2,7 +2,7 @@ import QtQuick
 import "./components"
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material
-import com.roboticus.datavisualiser
+import com.roboticus.DataVisualiser
 
 Window {
     id: window
