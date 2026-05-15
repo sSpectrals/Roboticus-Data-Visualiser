@@ -20,7 +20,6 @@ jobs:
       - name: Install Vulkan SDK
         uses: humbletim/setup-vulkan-sdk@v1.2.1
         with:
-          version: latest
           cache: true
 
       - name: Install Qt
