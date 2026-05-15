@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 1. Find Packages
 find_package(Qt6 REQUIRED COMPONENTS Quick Graphs SerialPort Gui)
 
-qt_standard_project_setup(REQUIRES 6.11)
+qt_standard_project_setup(REQUIRES 6.10)
 
 # 2. Add External Libraries (qmsgpack)
 add_subdirectory(libs/qmsgpack)
@@ -62,10 +62,9 @@ qt_add_qml_module(appRoboticus_Data_Visualiser
         "assets/SVG/download.svg"
         "assets/SVG/upload.svg"
 
-        "assets/Icons/apple-touch-icon.png"
-        "assets/Icons/icon.ico"
-        "assets/Icons/icon.svg"
-        "assets/Icons/icon.png"
+        "assets/Icons/com.roboticus.DataVisualiser.ico"
+        "assets/Icons/com.roboticus.DataVisualiser.svg"
+        "assets/Icons/com.roboticus.DataVisualiser.png"
 
     SOURCES
         # Controllers
@@ -128,16 +127,6 @@ set_target_properties(appRoboticus_Data_Visualiser PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-if(UNIX AND NOT APPLE)
-    install(FILES assets/Icons/icon.png
-            DESTINATION share/icons/hicolor/96x96/apps
-            RENAME com.roboticus.datavisualiser.png)
-    install(FILES assets/Icons/icon.svg
-            DESTINATION share/icons/hicolor/scalable/apps
-            RENAME com.roboticus.datavisualiser.svg)
-    install(FILES com.roboticus.datavisualiser.desktop
-            DESTINATION share/applications)
-endif()
 
 # 8. Installation
 include(GNUInstallDirs)

@@ -17,7 +17,6 @@ void SerialParser::onRawDataReady(const QByteArray &data) {
 void SerialParser::processMsgPackData(const QByteArray &data) {
   const DecodedFrame frame = decodeMsgPackFrame(data);
   if (!frame.isValid) {
-    qDebug() << "Frame contains no sensors or vectors";
     return;
   }
   emit frameDecoded(frame);
