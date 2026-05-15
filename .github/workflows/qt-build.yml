@@ -1,0 +1,52 @@
+name: Qt Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  release:
+    types: [created]
+
+jobs:
+  build-windows:
+    name: Windows
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.10.2'
+          modules: 'qtgraphs qtserialport'
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Deploy
+        run: |
+          mkdir deploy
+          copy build\Release\appRoboticus_Data_Visualiser.exe deploy\
+          windeployqt --qmldir ui deploy\appRoboticus_Data_Visualiser.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: deploy\
+
+      - name: Zip for release
+        if: github.event_name == 'release'
+        run: Compress-Archive -Path deploy\* -DestinationPath Roboticus-Data-Visualiser-windows.zip
+
+      - name: Upload to Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Roboticus-Data-Visualiser-windows.zip
