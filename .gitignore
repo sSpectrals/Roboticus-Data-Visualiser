@@ -74,6 +74,12 @@ CMakeLists.txt.user*
 *.dll
 *.exe
 
+# Flatpak build artifacts
+build-dir/
+.flatpak-builder/
+repo/
+*.flatpak
+
 # Directories with generated files
 .moc/
 .obj/
