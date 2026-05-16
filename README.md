@@ -61,7 +61,7 @@ Download the `.flatpak` from [GitHub Releases](https://github.com/sSpectrals/Rob
 ### RoboticusDebugger Library
 
 **Arduino IDE:** search `RoboticusDebugger` in the Library Manager.  
-**PlatformIO:** search `RoboticusDebugger` in the PlatformIO Library Manager.
+**PlatformIO:** search `RoboticusDebugger` in the PlatformIO Library Manager.  
 **Python** Download the RoboticusDebugger.py && Example.py from https://github.com/sSpectrals/RoboticusDebugger 
 
 An example sketch is included in the library.
